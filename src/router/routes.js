@@ -6,7 +6,7 @@ import {
 	Route,
 	Routes,
 } from "react-router-dom";
-import routers from "./routers";
+import routes from "./routes";
 import Swal from "sweetalert2";
 
 const Router = () => {
@@ -28,7 +28,7 @@ const Router = () => {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/">
-					{routers.map((item) => (
+					{routes.map((item) => (
 						<>
 							{item.layout === true ? (
 								<Route key={item.elements} element={<PrivateRoute />}>

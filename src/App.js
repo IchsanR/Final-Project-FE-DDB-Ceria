@@ -1,5 +1,4 @@
-import logo from './logo.svg';
-import './App.css';
+import Router from "./router/routes";
 
 function App() {
   return (
