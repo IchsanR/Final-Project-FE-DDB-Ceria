@@ -1,52 +1,16 @@
-import React from "react";
-import {
-	BrowserRouter,
-	Navigate,
-	Outlet,
-	Route,
-	Routes,
-} from "react-router-dom";
-import routes from "./routes";
-import Swal from "sweetalert2";
+import { Home, Login } from "../pages";
 
-const Router = () => {
-	const PrivateRoute = () => {
-		const token = localStorage.getItem("token");
-		const session = localStorage.getItem("session");
-		if (token && session) {
-			return <Outlet />;
-		} else {
-			Swal.fire({
-				title: "Halaman tidak bisa di akses",
-				text: "Harap login terlebih dahulu",
-				icon: "error",
-			});
-			return <Navigate to={"/login"} />;
-		}
-	};
-	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/">
-					{routes.map((item) => (
-						<>
-							{item.layout === true ? (
-								<Route key={item.elements} element={<PrivateRoute />}>
-									<Route index element={item.elements} path={item.path} />
-								</Route>
-							) : (
-								<Route
-									path={item.path}
-									element={item.elements}
-									key={item.elements}
-								/>
-							)}
-						</>
-					))}
-				</Route>
-			</Routes>
-		</BrowserRouter>
-	);
-};
+const routes = [
+	{
+		elements: <Home />,
+		path: "/",
+		layout: true,
+	},
+	{
+		elements: <Login />,
+		path: "/login",
+		layout: false,
+	},
+];
 
-export default Router;
+export default routes;
