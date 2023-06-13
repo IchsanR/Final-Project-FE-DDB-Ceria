@@ -21,7 +21,7 @@ const Router = () => {
 				text: "Harap login terlebih dahulu",
 				icon: "error",
 			});
-			return <Navigate to={"/"} />;
+			return <Navigate to={"/login"} />;
 		}
 	};
 	return (

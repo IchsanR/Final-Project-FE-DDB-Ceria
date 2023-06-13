@@ -1,7 +1,14 @@
+import { Home, Login } from "../pages";
+
 const routes = [
 	{
-		elements: <></>,
+		elements: <Home />,
 		path: "/",
+		layout: true,
+	},
+	{
+		elements: <Login />,
+		path: "/login",
 		layout: false,
 	},
 ];
