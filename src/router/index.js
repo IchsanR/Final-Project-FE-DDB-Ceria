@@ -1,7 +1,9 @@
+import { Login } from "../pages";
+
 const routes = [
 	{
-		elements: <></>,
-		path: "/",
+		elements: <Login></Login>,
+		path: "/login",
 		layout: false,
 	},
 ];
