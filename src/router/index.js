@@ -12,8 +12,7 @@ import routers from "./routers";
 const Router = () => {
 	const PrivateRoute = () => {
 		const token = localStorage.getItem("token");
-		const session = localStorage.getItem("session");
-		if (token && session) {
+		if (token) {
 			return <Outlet />;
 		} else {
 			Swal.fire({
