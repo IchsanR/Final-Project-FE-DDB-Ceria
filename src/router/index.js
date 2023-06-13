@@ -27,7 +27,7 @@ const Router = () => {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/">
-					{routes.map((item) => (
+					{routers.map((item) => (
 						<>
 							{item.layout === true ? (
 								<Route key={item.elements} element={<PrivateRoute />}>
