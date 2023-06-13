@@ -8,7 +8,7 @@ const routes = [
 	},
 	{
 		elements: <Login />,
-		path: "/login",
+		path: "login",
 		layout: false,
 	},
 ];
