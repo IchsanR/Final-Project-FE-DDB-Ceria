@@ -1,4 +1,4 @@
-import { Home, Login } from "../pages";
+import { Home, Login, Register } from "../pages";
 
 const routes = [
 	{
@@ -9,6 +9,11 @@ const routes = [
 	{
 		elements: <Login />,
 		path: "login",
+		layout: false,
+	},
+	{
+		elements: <Register />,
+		path: "register",
 		layout: false,
 	},
 ];
