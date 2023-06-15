@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Buttons, Inputs, Logo } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/User";
+import Swal from "sweetalert2";
 
 const Login = () => {
 	const [form, setForm] = useState({
@@ -10,7 +11,7 @@ const Login = () => {
 	});
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
-	const [loginUser, response] = useLoginUserMutation();
+	const [loginUser] = useLoginUserMutation();
 
 	const handleChecked = (e) => {
 		e.preventDefault();
@@ -21,13 +22,43 @@ const Login = () => {
 	const onSubmit = (e) => {
 		e.preventDefault();
 
-		loginUser(form)
-			.then((response) => {
-				console.log(response);
-			})
-			.catch((error) => {
-				console.log(error);
+		const handleSuccess = (response) => {
+			if (response.data.code === 200) {
+				Swal.fire({
+					title: "Success!",
+					text: `Selamat datang ${response.data.data.name}`,
+					icon: "success",
+					timer: 3000,
+				});
+				localStorage.setItem('token', response.data.data.token.split(' ')[1]);
+			} else {
+				Swal.fire({
+					title: "Error!",
+					text: response.data.message,
+					timer: 2500,
+					icon: "error",
+					showConfirmButton: false,
+				});
+			}
+		};
+
+		if (checked === false)
+			return Swal.fire({
+				title: "Error!",
+				text: "Please, accept the user agreement",
+				icon: "error",
+				showConfirmButton: true,
+				confirmButtonText: "OK!",
 			});
+		if (checked === true) {
+			return loginUser(form)
+				.then((response) => {
+					handleSuccess(response);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
 	};
 
 	return (
@@ -50,7 +81,7 @@ const Login = () => {
 					</div>
 					<div className="flex justify-between my-3">
 						<div>
-							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2" />
+							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2" onChange={(e) => handleChecked(e)} />
 							<label htmlFor="rememberMe" className="text-[#6B7280]">Remember Me</label>
 						</div>
 						<div>
