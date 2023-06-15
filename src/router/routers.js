@@ -16,6 +16,8 @@ const routes = [
 		path: "register",
 		layout: false,
 	},
+	
+
 ];
 
 export default routes;
