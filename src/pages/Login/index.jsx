@@ -1,24 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { Buttons, Inputs, Logo } from "../../components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginUserMutation } from "../../redux/api/User";
 
 const Login = () => {
+	const [form, setForm] = useState({
+		email: "",
+		password: ''
+	});
+	const [checked, setChecked] = useState(false);
+	const navigate = useNavigate();
+	const [loginUser, response] = useLoginUserMutation();
+
+	const handleChecked = (e) => {
+		e.preventDefault();
+		if (e.target.checked === true) return setChecked(true);
+		if (e.target.checked === false) return setChecked(false);
+	};
+
+	const onSubmit = (e) => {
+		e.preventDefault();
+
+		loginUser(form)
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
 	return (
 		<div className="flex justify-center items-center flex-col h-screen w-screen px-4">
 			<header>
 				<Logo />
 			</header>
 			<main className="md:w-[500px] w-full">
-				<form className=" w-full">
+				<form className=" w-full" onSubmit={(e) => onSubmit(e)}>
 					<div className="my-10">
 						<h1 className="font-bold text-2xl">Sign in to your account</h1>
 					</div>
 					<div className="mb-3">
-						<Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"}
+						<Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setForm({ ...form, email: e.target.value })}
 						/>
 					</div>
 					<div className="mb-3">
-						<Inputs id={"password"} placeholder={"**********"} label={"Your Password"} type={"password"}
+						<Inputs id={"password"} placeholder={"**********"} label={"Your Password"} type={"password"} onChange={(e) => setForm({ ...form, password: e.target.value })}
 						/>
 					</div>
 					<div className="flex justify-between my-3">
