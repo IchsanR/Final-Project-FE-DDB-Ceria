@@ -1,5 +1,6 @@
 import { Home, Login } from "../pages";
 import NotFound from "../pages/NotFound";
+import { Home, Login, Register } from "../pages";
 
 const routes = [
 	{
@@ -17,6 +18,13 @@ const routes = [
 		path: "*",
 		layout: false,
 	},
+	{
+		elements: <Register />,
+		path: "register",
+		layout: false,
+	},
+	
+
 ];
 
 export default routes;
