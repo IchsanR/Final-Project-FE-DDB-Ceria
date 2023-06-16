@@ -1,4 +1,5 @@
-import ImportCsv from "./import-csv/ImportCsv"
+import ImportCsv from "./importCsv";
+
 
 export {
   ImportCsv,
