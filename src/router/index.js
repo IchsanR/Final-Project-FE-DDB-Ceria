@@ -1,5 +1,13 @@
 import { Login } from "../pages";
-
+import {
+	BrowserRouter,
+	Navigate,
+	Outlet,
+	Route,
+	Routes,
+} from "react-router-dom";
+import Swal from "sweetalert2";
+import routers from "./routers";
 const routes = [
 	{
 		elements: <Login></Login>,

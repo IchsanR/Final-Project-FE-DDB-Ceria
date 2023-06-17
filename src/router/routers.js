@@ -1,4 +1,3 @@
-import { Home, Login } from "../pages";
 import NotFound from "../pages/NotFound";
 import { Home, Login, Register } from "../pages";
 
