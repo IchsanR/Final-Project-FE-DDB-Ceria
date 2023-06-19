@@ -1,8 +1,9 @@
 import { NavigasiBar } from "../../components";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "../../redux/slice/dataSlice";
 import { DataTable } from "primereact/datatable";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
@@ -23,13 +24,16 @@ const TransactionPage = () => {
   const data = useSelector((state) => state.data.items);
   const status = useSelector((state) => state.data.status);
   const error = useSelector((state) => state.data.error);
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [filters, setFilters] = useState(null);
 
   useEffect(() => {
     dispatch(fetchData());
+    initFilters()
   }, [dispatch]);
 
   // if (status === 'loading') {
-  //   return <div>Loading...</div>;
+  //   setLoading(true)
   // }
 
   // if (status === 'failed') {
@@ -42,10 +46,10 @@ const TransactionPage = () => {
       case "failed":
         return "danger";
 
-      case "success":
+      case "SUCCESS":
         return "success";
 
-      case "pending":
+      case "WAITING_FOR_DEBITTED":
         return "warning";
     }
   };
@@ -55,7 +59,7 @@ const TransactionPage = () => {
     );
   };
   //filtering status
-  const statuses = ["failed", "pending", "success"];
+  const statuses = ["SUCCESS", "WAITING_FOR_DEBITTED"];
   const statusFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -75,7 +79,7 @@ const TransactionPage = () => {
 
   //custom price
   const balanceBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.price);
+    return formatCurrency(rowData.bill_amount);
   };
   const formatCurrency = (value) => {
     if (value !== undefined && value !== null) {
@@ -97,22 +101,172 @@ const TransactionPage = () => {
       />
     );
   };
+  //custom date
+  const dateBodyTemplate = (rowData) => {
+    return formatDate(rowData.created_at);
+  };
+  const formatDate = (value) => {
+    if (value !== undefined && value !== null) {
+      const dateValue = value ? new Date(value) : null;
+      // Now you can safely use toLocaleString()
+      console.log(dateValue);
+      return dateValue.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    }
+  };
+  //filtering date
+  const dateFilterTemplate = (options) => {
+    console.log("dateov" + options.value);
+    return (
+      <Calendar
+        value={options.value}
+        onChange={(e) => options.filterCallback(e.value, options.index)}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+      />
+    );
+  };
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+    _filters["global"].value = value;
+
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
+  const initFilters = () => {
+    setFilters({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      id: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+      },
+      oda_number: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+      },
+     created_at: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }]
+      },
+      bill_amount: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+      },
+      status: {
+        operator: FilterOperator.OR,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+      },
+    });
+    setGlobalFilterValue("");
+  };
+
+  //render header
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-content-between">
+        <span className="p-input-icon-left">
+        <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder="Global Search"
+          />
+        </span>
+        <span>
+          <Button
+            tooltip="Export CSV"
+            tooltipOptions={{
+              position: "bottom",
+              mouseTrack: true,
+              mouseTrackTop: 15,
+            }}
+            type="button"
+            icon="pi pi-file"
+            rounded
+            onClick={() => exportCSV(false)}
+            data-pr-tooltip="CSV"
+          />
+          <Button
+            tooltip="Export XLS"
+            tooltipOptions={{
+              position: "bottom",
+              mouseTrack: true,
+              mouseTrackTop: 15,
+            }}
+            type="button"
+            icon="pi pi-file-excel"
+            severity="success"
+            rounded
+            onClick={exportExcel}
+            data-pr-tooltip="XLS"
+          />
+        </span>
+      </div>
+    );
+  };
+  const dt = useRef(null);
+  const exportCSV = (selectionOnly) => {
+    dt.current.exportCSV({ selectionOnly });
+  };
+  const exportExcel = () => {
+    import("xlsx").then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(data.data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAsExcelFile(excelBuffer, "data");
+    });
+  };
+  const saveAsExcelFile = (buffer, fileName) => {
+    import("file-saver").then((module) => {
+      if (module && module.default) {
+        let EXCEL_TYPE =
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+        let EXCEL_EXTENSION = ".xlsx";
+        const data = new Blob([buffer], {
+          type: EXCEL_TYPE,
+        });
+
+        module.default.saveAs(
+          data,
+          fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+        );
+      }
+    });
+  };
+  const header = renderHeader();
 
   return (
     <>
       <NavigasiBar />
       <div className="card">
-        <DataTable paginator rows={5} value={data.message} tableStyle={{ minWidth: "50rem" }}>
+        <DataTable
+          ref={dt}
+          header={header}
+          paginator
+          rows={10}
+          value={data.data}
+          tableStyle={{ minWidth: "50rem" }}
+        >
           <Column field="id" sortable header="Id"></Column>
           <Column
             field="oda_number"
             sortable
+            dataType="numeric"
             filter
             style={{ width: "25%" }}
             header="Oda Number"
           ></Column>
           <Column
-            field="price"
+            field="bill_amount"
             body={balanceBodyTemplate}
             filter
             sortable
@@ -122,6 +276,16 @@ const TransactionPage = () => {
             showAddButton={false}
             header="Price"
           ></Column>
+          <Column
+            header="Date"
+            field="created_at"
+            dataType="date"
+            sortable
+            style={{ minWidth: "10rem" }}
+            body={dateBodyTemplate}
+            filterElement={dateFilterTemplate}
+            filter
+          />
           <Column
             field="status"
             filter

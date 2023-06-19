@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { backendUrl } from '../../config/env.config';
 export const fetchData = createAsyncThunk('data/fetchData', async () => {
-  const response = await fetch(backendUrl+'/api/get-transactions/1');
+  const response = await fetch( backendUrl+'/get-transactions');
   const data = await response.json();
   return data;
 });
