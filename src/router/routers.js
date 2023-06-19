@@ -1,5 +1,5 @@
 import NotFound from "../pages/NotFound";
-import { Home, Login, Register } from "../pages";
+import { Home, Login, Register, TransactionPage } from "../pages";
 
 const routes = [
 	{
@@ -20,6 +20,11 @@ const routes = [
 	{
 		elements: <Register />,
 		path: "register",
+		layout: false,
+	},
+	{
+		elements: <TransactionPage />,
+		path: "transaction-page",
 		layout: false,
 	},
 	
