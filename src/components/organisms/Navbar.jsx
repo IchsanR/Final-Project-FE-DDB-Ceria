@@ -10,12 +10,12 @@ export default function NavigasiBar() {
       <div className="flex md:order-2">
         <Navbar.Collapse
         >
-          <Navbar.Link active href="#">
+          <Navbar.Link  href="/">
             <p>Home</p>
           </Navbar.Link>
           <Navbar.Link href="/transaction-page">Transaction Data</Navbar.Link>
 
-          <Dropdown inline label={<Avatar alt="User settings" rounded />}>
+          <Dropdown inline label={<Avatar  alt="User settings" rounded />}>
             <Dropdown.Header>
               <span className="block text-sm">Bonnie Green</span>
               <span className="block truncate text-sm font-medium">
