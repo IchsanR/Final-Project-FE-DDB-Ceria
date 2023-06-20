@@ -9,46 +9,22 @@ const Register = () => {
     name: "",
     email: "",
     phone: "",
-    password: ""
+    password: "",
   });
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
   const [registerUser] = useRegisterUserMutation();
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
   const handleChecked = (e) => {
     setChecked(e.target.checked);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
-    const handleSuccess = (response) => {
-      if (response.data.code === 200) {
-        Swal.fire({
-          title: "Success!",
-          text: `Welcome ${response.data.data.name}`,
-          icon: "success",
-          timer: 3000,
-        });
-      } else {
-        Swal.fire({
-          title: "Error!",
-          text: response.data.message,
-          timer: 2500,
-          icon: "error",
-          showConfirmButton: false,
-        });
-      }
-    };
+    // Check the form data
 
-    if (checked === false)
+    if (checked === false) {
       return Swal.fire({
         title: "Error!",
         text: "Please, accept the user agreement",
@@ -56,15 +32,40 @@ const Register = () => {
         showConfirmButton: true,
         confirmButtonText: "OK!",
       });
-    if (checked === true) {
-      return registerUser(form)
-        .then((response) => {
-          handleSuccess(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     }
+
+    try {
+      const response = await registerUser(form).unwrap();
+
+      // check for specific error message
+      if (response.code === 400) {
+        return Swal.fire({
+          title: "Error!",
+          text: "Nama yang Anda masukkan sudah digunakan, silakan gunakan nama yang berbeda",
+          icon: "error",
+          showConfirmButton: true,
+          confirmButtonText: "OK!",
+        });
+      }
+
+      if (response.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: `Welcome ${response.data[0].name} Silahkan Login`,
+          icon: "success",
+          timer: 3000,
+        });
+        navigate("/login");
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: response.message,
+          timer: 2500,
+          icon: "error",
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {}
   };
 
   return (
@@ -84,8 +85,7 @@ const Register = () => {
               label={"Name"}
               type={"text"}
               name={"name"}
-              value={form.name}
-              onChange={handleChange}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
           </div>
           <div className="mb-3">
@@ -95,8 +95,7 @@ const Register = () => {
               label={"Your Email"}
               type={"email"}
               name={"email"}
-              value={form.email}
-              onChange={handleChange}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
           </div>
           <div className="mb-3">
@@ -105,9 +104,8 @@ const Register = () => {
               placeholder={"0812xxxxxx"}
               label={"Phone Number"}
               type={"tel"}
-              name={"phone"}
-              value={form.phone}
-              onChange={handleChange}
+              name={"phone"} // Atribut name ini sangat penting
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
           </div>
           <div className="mb-3">
@@ -117,8 +115,7 @@ const Register = () => {
               label={"Your Password"}
               type={"password"}
               name={"password"}
-              value={form.password}
-              onChange={handleChange}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
           </div>
           <div className="flex justify-between my-3">

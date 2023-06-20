@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 const Login = () => {
 	const [form, setForm] = useState({
-		email: "",
+		name: "",
 		password: ''
 	});
 	const [checked, setChecked] = useState(false);
@@ -72,7 +72,7 @@ const Login = () => {
 						<h1 className="font-bold text-2xl">Sign in to your account</h1>
 					</div>
 					<div className="mb-3">
-						<Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setForm({ ...form, email: e.target.value })}
+						<Inputs id={"name"} placeholder={"name@company.com"} label={"Your name"} type={"name"} onChange={(e) => setForm({ ...form, name: e.target.value })}
 						/>
 					</div>
 					<div className="mb-3">
