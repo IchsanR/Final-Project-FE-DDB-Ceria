@@ -3,7 +3,7 @@ import { Button, Modal } from "flowbite-react";
 import Datepicker from "react-tailwindcss-datepicker";
 
 
-const ImportCsv = () => {
+const ExportCsv = () => {
   const [openModal, setOpenModal] = useState();
   const props = { openModal, setOpenModal };
 
@@ -54,4 +54,4 @@ const ImportCsv = () => {
   );
 };
 
-export default ImportCsv;
+export default ExportCsv;
