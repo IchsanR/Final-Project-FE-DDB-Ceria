@@ -23,18 +23,21 @@ const Login = () => {
 		e.preventDefault();
 
 		const handleSuccess = (response) => {
-			if (response.data.code === 200) {
-				Swal.fire({
-					title: "Success!",
-					text: `Selamat datang ${response.data.data.name}`,
-					icon: "success",
-					timer: 3000,
-				});
-				localStorage.setItem('token', response.data.data.token.split(' ')[1]);
-			} else {
-				Swal.fire({
+			if (response.data) {
+				if (response.data.code === 200)
+					return (
+						Swal.fire({
+							title: "Success!",
+							text: `Selamat datang ${response.data.data.name}`,
+							icon: "success",
+							timer: 3000,
+						}),
+						localStorage.setItem('token', response.data.data.token.split(' ')[1]));
+			}
+			if (response.error) {
+				return Swal.fire({
 					title: "Error!",
-					text: response.data.message,
+					text: response.error.data.message,
 					timer: 2500,
 					icon: "error",
 					showConfirmButton: false,
@@ -54,9 +57,6 @@ const Login = () => {
 			return loginUser(form)
 				.then((response) => {
 					handleSuccess(response);
-				})
-				.catch((error) => {
-					console.log(error);
 				});
 		}
 	};
@@ -93,7 +93,7 @@ const Login = () => {
 					</div>
 				</form>
 				<div>
-					<p className="text-[#6B7280]" >Don't have account yet? <span><Link className="text-violet-800 font-semibold">Sign Up</Link></span></p>
+					<p className="text-[#6B7280]" >Don't have account yet? <span><Link className="text-violet-800 font-semibold" to={'/register'}>Sign Up</Link></span></p>
 				</div>
 			</main>
 		</div>
