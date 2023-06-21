@@ -3,6 +3,7 @@ import { Buttons, Inputs, Logo } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/User";
 import Swal from "sweetalert2";
+import { CookieStorage } from "cookie-storage";
 
 const Login = () => {
 	const [form, setForm] = useState({
@@ -12,6 +13,7 @@ const Login = () => {
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
 	const [loginUser] = useLoginUserMutation();
+	const cookieStorage = new CookieStorage()
 
 	const handleChecked = (e) => {
 		e.preventDefault();
@@ -34,8 +36,10 @@ const Login = () => {
 					if (checked === false) {
 						sessionStorage.setItem('token', response.data.data[0].token);
 						sessionStorage.setItem('name', response.data.data[0].name);
+						cookieStorage.setItem('gin_cookie', response.data.data[0].token)
 						return navigate('/');
 					} else {
+						cookieStorage.setItem('gin_cookie', response.data.data[0].token)
 						localStorage.setItem('name', response.data.data[0].name);
 						localStorage.setItem('token', response.data.data[0].token);
 						return navigate('/');
