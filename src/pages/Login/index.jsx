@@ -24,16 +24,25 @@ const Login = () => {
 
 		const handleSuccess = (response) => {
 			if (response.data) {
-				if (response.data.code === 200)
-					return (
-						Swal.fire({
-							title: "Success!",
-							text: `Selamat datang ${response.data.data.name}`,
-							icon: "success",
-							timer: 3000,
-						}),
-						localStorage.setItem('token', response.data.data.token.split(' ')[1]));
+				if (response.data.code === 200) {
+					Swal.fire({
+						title: "Success!",
+						text: `Selamat datang ${response.data.data[0].name}`,
+						icon: "success",
+						timer: 3000,
+					});
+					if (checked === false) {
+						sessionStorage.setItem('token', response.data.data[0].token);
+						sessionStorage.setItem('name', response.data.data[0].name);
+						return navigate('/');
+					} else {
+						localStorage.setItem('name', response.data.data[0].name);
+						localStorage.setItem('token', response.data.data[0].token);
+						return navigate('/');
+					}
+				}
 			}
+
 			if (response.error) {
 				return Swal.fire({
 					title: "Error!",
@@ -45,20 +54,10 @@ const Login = () => {
 			}
 		};
 
-		if (checked === false)
-			return Swal.fire({
-				title: "Error!",
-				text: "Please, accept the user agreement",
-				icon: "error",
-				showConfirmButton: true,
-				confirmButtonText: "OK!",
+		loginUser(form)
+			.then((response) => {
+				handleSuccess(response);
 			});
-		if (checked === true) {
-			return loginUser(form)
-				.then((response) => {
-					handleSuccess(response);
-				});
-		}
 	};
 
 	return (
