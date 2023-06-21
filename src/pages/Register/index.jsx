@@ -64,7 +64,7 @@ const Register = () => {
     if (passwordStrength.score < 3) {
       return Swal.fire({
         title: "Error!",
-        text: "Password anda lemah syahwat",
+        text: "Password anda lemah, lebih perkuat passwordnya",
         icon: "error",
         showConfirmButton: true,
         confirmButtonText: "OK!",
