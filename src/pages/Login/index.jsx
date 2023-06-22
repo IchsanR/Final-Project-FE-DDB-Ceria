@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/User";
@@ -18,6 +18,12 @@ const Login = () => {
 		if (e.target.checked === true) return setChecked(true);
 		if (e.target.checked === false) return setChecked(false);
 	};
+
+	useEffect(() => {
+		localStorage.clear();
+		sessionStorage.clear();
+	}, []);
+
 
 	const onSubmit = (e) => {
 		e.preventDefault();

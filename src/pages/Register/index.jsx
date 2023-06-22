@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterUserMutation } from "../../redux/api/User";
@@ -20,6 +20,12 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [registerUser] = useRegisterUserMutation();
+
+  useEffect(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  }, []);
+
 
   const handleChecked = (e) => {
     setChecked(e.target.checked);
@@ -201,10 +207,10 @@ const Register = () => {
                   <div className="text-right">
                     <span
                       className={`text-sm font-semibold inline-block ${passwordStrength.score >= 3
-                          ? "text-green-500"
-                          : passwordStrength.score === 2
-                            ? "text-orange-500"
-                            : "text-red-500"
+                        ? "text-green-500"
+                        : passwordStrength.score === 2
+                          ? "text-orange-500"
+                          : "text-red-500"
                         }`}
                     >
                       {passwordStrength.score >= 3
@@ -219,10 +225,10 @@ const Register = () => {
                   <div
                     style={{ width: `${(passwordStrength.score + 1) * 20}%` }}
                     className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${passwordStrength.score >= 3
-                        ? "bg-green-500"
-                        : passwordStrength.score === 2
-                          ? "bg-orange-500"
-                          : "bg-red-500"
+                      ? "bg-green-500"
+                      : passwordStrength.score === 2
+                        ? "bg-orange-500"
+                        : "bg-red-500"
                       }`}
                   ></div>
                 </div>
