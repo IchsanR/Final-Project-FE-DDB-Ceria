@@ -1,8 +1,17 @@
 // dataSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { backendUrl } from '../../config/env.config';
-export const fetchData = createAsyncThunk('data/fetchData', async () => {
-  const response = await fetch( backendUrl+'/get-transactions');
+export const fetchData = createAsyncThunk('data/fetchData', async (sdate,edate) => {
+    let url =''
+    if(sdate&&edate){
+         url = backendUrl + `/get-transactionsdate/${sdate}/${edate}`
+    }else {
+         url = backendUrl + '/get-transactions-limit/1'
+    }
+    
+  
+    const response = await fetch( url);
+
   const data = await response.json();
   return data;
 });
@@ -31,4 +40,4 @@ const dataSlice = createSlice({
   },
 });
 
-export default dataSlice.reducer;
+export default dataSlice.reducer

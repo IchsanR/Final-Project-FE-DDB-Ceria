@@ -16,7 +16,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
 import "primeflex/primeflex.css"; // css utility
-import "./index.css";
+import "./style.css";
 import "./flags.css";
 
 const TransactionPage = () => {
@@ -26,10 +26,11 @@ const TransactionPage = () => {
   const error = useSelector((state) => state.data.error);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
-
+  const [dates, setDates] = useState(null);
+  const [isFilter, setIsFilter] = useState(null);
   useEffect(() => {
     dispatch(fetchData());
-    initFilters()
+    initFilters();
   }, [dispatch]);
 
   // if (status === 'loading') {
@@ -109,7 +110,7 @@ const TransactionPage = () => {
     if (value !== undefined && value !== null) {
       const dateValue = value ? new Date(value) : null;
       // Now you can safely use toLocaleString()
-      console.log(dateValue);
+      // console.log(dateValue);
       return dateValue.toLocaleDateString("en-US", {
         day: "2-digit",
         month: "2-digit",
@@ -119,7 +120,7 @@ const TransactionPage = () => {
   };
   //filtering date
   const dateFilterTemplate = (options) => {
-    console.log("dateov" + options.value);
+    // console.log("dateov" + options.value);
     return (
       <Calendar
         value={options.value}
@@ -143,38 +144,57 @@ const TransactionPage = () => {
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       id: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
       oda_number: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-     created_at: {
+      created_at: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }]
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
       },
       bill_amount: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
       status: {
         operator: FilterOperator.OR,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
     setGlobalFilterValue("");
   };
+  const fiterDate = ()=>{
+    const sdate = dates[0]
+    const edate = dates[1]
+    setIsFilter(true)
+  }
 
   //render header
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
         <span className="p-input-icon-left">
-        <i className="pi pi-search" />
+          <i className="pi pi-search" />
           <InputText
             value={globalFilterValue}
             onChange={onGlobalFilterChange}
             placeholder="Global Search"
+          />
+          <Calendar
+            placeholder="Select Range"
+            value={dates}
+            onChange={(e) => setDates(e.value)}
+            selectionMode="range"
+            readOnlyInput
+          />
+          <Button
+            placeholder="Select Range"
+            label="Filter"
+            type="submit"
+            onClick={fiterDate}
+            icon="pi pi-check"
           />
         </span>
         <span>

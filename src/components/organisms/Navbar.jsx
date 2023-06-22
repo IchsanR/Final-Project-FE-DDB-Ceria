@@ -24,7 +24,7 @@ export default function NavigasiBar() {
             </Dropdown.Header>
             <Dropdown.Item>Transaction</Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item>Sign out</Dropdown.Item>
+            <Dropdown.Item href="/">Sign out</Dropdown.Item>
           </Dropdown>
           <Navbar.Toggle />
         </Navbar.Collapse>
