@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal } from "flowbite-react";
 import Datepicker from "react-tailwindcss-datepicker";
 import { CSVLink } from "react-csv";
-import { useGetModalQuery } from "../../redux/api/exportCsvApi";
-
+import axios from "axios";
 
 const ExportCsv = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -13,23 +12,36 @@ const ExportCsv = () => {
     endDate: "",
   });
   const [status, setStatus] = useState("");
-  const startDate = date.startDate.split('-').reverse().join('-')
-  const endDate = date.endDate.split('-').reverse().join('-')
-
 
   const handleValueChange = (newValue) => {
-    // console.log("newValue:", newValue);
+    console.log("newValue:", newValue);
     setDate(newValue);
   };
 
-  const query = useGetModalQuery({status, startDate, endDate})
-  console.log(query.isSuccess);
-
   useEffect(() => {
-    if (query.isSuccess === true) {
-      setDataCsv(query.data)
-    }
-  },[])
+    getData()
+  }, [date, status])
+  
+  const getData = () => {
+  const urlCsv = "http://localhost:8081";
+  const setting = {
+    status,
+    startDate: date.startDate.split("-").reverse().join("-"),
+    endDate: date.endDate.split("-").reverse().join("-")
+  }
+  return new Promise((resolve, reject) => {
+    axios.get(`${urlCsv}/export-transaction/${setting.status && setting.startDate && setting.endDate ? `?status=${setting.status}&start_date=${setting.startDate}&end_date=${setting.endDate}` : setting.status ? `?status=${setting.status}` : "" }`
+  )
+  .then((res) => {
+    resolve(res)
+  console.log(`start: ${setting.startDate}, end: ${setting.endDate}, status: ${setting.status}`)
+  setDataCsv(res.data)
+  })
+  .catch((err) => {
+    reject(err)
+  })
+})
+  }
 
   return (
     <>
@@ -56,8 +68,11 @@ const ExportCsv = () => {
             </div>
           </div>
           <Modal.Footer>
-            <Button onClick={() => {return setOpenModal(false), setDate({...date, startDate: "", endDate: ""})}}>
-              <CSVLink data={dataCsv} filename={"data-transaction.csv"}>
+            <Button
+              onClick={() => {
+                return setOpenModal(false), setDate({ ...date, startDate: "", endDate: "" });
+              }}>
+              <CSVLink data={dataCsv} filename="text.csv">
                 Export
               </CSVLink>
             </Button>
