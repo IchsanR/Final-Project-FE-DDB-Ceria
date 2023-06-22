@@ -3,6 +3,8 @@ import { Button, Modal } from "flowbite-react";
 import Datepicker from "react-tailwindcss-datepicker";
 import { CSVLink } from "react-csv";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { backendUrl } from '../../config/env.config';
 
 const ExportCsv = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -18,30 +20,52 @@ const ExportCsv = () => {
     setDate(newValue);
   };
 
-  useEffect(() => {
-    getData()
-  }, [date, status])
-  
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
   const getData = () => {
-  const urlCsv = "http://localhost:8081";
-  const setting = {
-    status,
-    startDate: date.startDate.split("-").reverse().join("-"),
-    endDate: date.endDate.split("-").reverse().join("-")
-  }
-  return new Promise((resolve, reject) => {
-    axios.get(`${urlCsv}/export-transaction/${setting.status && setting.startDate && setting.endDate ? `?status=${setting.status}&start_date=${setting.startDate}&end_date=${setting.endDate}` : setting.status ? `?status=${setting.status}` : "" }`
-  )
-  .then((res) => {
-    resolve(res)
-  console.log(`start: ${setting.startDate}, end: ${setting.endDate}, status: ${setting.status}`)
-  setDataCsv(res.data)
-  })
-  .catch((err) => {
-    reject(err)
-  })
-})
-  }
+    const setting = {
+      status,
+      startDate: date.startDate,
+      endDate: date.endDate,
+    };
+    return new Promise((resolve, reject) => {
+      axios
+        .get(
+          `${backendUrl}/api/export-transaction/${
+            setting.status && setting.startDate && setting.endDate
+              ? `?status=${setting.status}&start_date=${setting.startDate}&end_date=${setting.endDate}`
+              : setting.status
+              ? `?status=${setting.status}`
+              : ""
+          }`, {
+            headers: {
+              Authorization: `${token}`,
+            }
+          }
+        )
+        .then((res) => {
+          resolve(res);
+          console.log(`start: ${setting.startDate}, end: ${setting.endDate}, status: ${setting.status}`);
+          setDataCsv(res.data);
+        })
+        .catch((err) => {
+          if(err) {
+            Swal.fire({
+              title: "Oops..",
+              text: `data tidak tersedia`,
+              icon: "error",
+              timer: 3000,
+            });
+          }
+          // reject(err);
+        });
+    });
+  };
+
+  useEffect(() => {
+    getData();
+  }, [date, status]);
+
 
   return (
     <>
@@ -63,7 +87,7 @@ const ExportCsv = () => {
               </select>
               <div>
                 <label className='block text-sm font-medium text-gray-900 dark:text-white pb-2'>Choose Date</label>
-                <Datepicker value={date} onChange={handleValueChange} />
+                <Datepicker value={date} onChange={handleValueChange} displayFormat={"DD-MM-YYYY"}  />
               </div>
             </div>
           </div>
@@ -72,7 +96,7 @@ const ExportCsv = () => {
               onClick={() => {
                 return setOpenModal(false), setDate({ ...date, startDate: "", endDate: "" });
               }}>
-              <CSVLink data={dataCsv} filename="text.csv">
+              <CSVLink data={dataCsv} filename='data.csv'>
                 Export
               </CSVLink>
             </Button>

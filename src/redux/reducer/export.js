@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { apiModal } from "../api/exportCsvApi";
+import { apiCsv } from "../api/exportCsvApi";
 
 const initialState = {
   data: [],
@@ -9,14 +9,14 @@ const initialState = {
 
 const exportsCsv = createReducer(initialState, (builder) => {
   // pending
-  builder.addCase(apiModal.pending, (state) => {
+  builder.addCase(apiCsv.pending, (state) => {
     return {
       ...state,
       isloading: true,
     }
   })
   // fulfilled
-  builder.addCase(apiModal.fulfilled, (state, action) => {
+  builder.addCase(apiCsv.fulfilled, (state, action) => {
     return {
       ...state,
       isloading: false,
@@ -25,7 +25,7 @@ const exportsCsv = createReducer(initialState, (builder) => {
     }
   })
   // rejected
-  builder.addCase(apiModal.rejected, (state, action) => {
+  builder.addCase(apiCsv.rejected, (state, action) => {
     return {
       ...state,
       isloading: false,

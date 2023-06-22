@@ -3,7 +3,7 @@ import thunk from "redux-thunk";
 import storage from 'redux-persist/lib/storage';
 import { userApi } from "./api/User";
 import rootReducer from "./reducer/reducer";
-import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer } from "redux-persist";
+import { persistReducer } from "redux-persist";
 
 const persistConfig = {
   key: "root",
