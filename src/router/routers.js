@@ -28,7 +28,6 @@ const routes = [
 		layout: false,
 	},
 	
-
 ];
 
 export default routes;
