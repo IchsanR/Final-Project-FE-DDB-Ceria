@@ -1,12 +1,14 @@
 import React, { Fragment } from "react";
 import { NavigasiBar } from "../../components";
 import { Button, Accordion } from "flowbite-react";
+import ExportCsv from "../../components/molecule/ExportCsv";
 
 const Home = () => {
   return (
     <Fragment>
       <NavigasiBar />
         <h1 className="text-4xl font-bold mb-4 text-center">Selamat Datang di RECONCERIA</h1>
+		<ExportCsv />
 		<Accordion>
       <Accordion.Panel>
         <Accordion.Title>
@@ -98,6 +100,4 @@ const Home = () => {
     </Accordion>
     </Fragment>
   );
-};
-
-export default Home;
+}

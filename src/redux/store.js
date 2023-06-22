@@ -5,6 +5,8 @@ import { userApi } from "./api/User";
 import rootReducer from "./reducer/reducer";
 import { persistReducer } from "redux-persist";
 import dataReducer from './slice/dataSlice'
+import { apiModal } from "./api/exportCsvApi";
+
 const persistConfig = {
   key: "root",
   storage,
@@ -18,5 +20,5 @@ export const store = configureStore({
     persistedReducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(thunk, userApi.middleware),
+    getDefaultMiddleware().concat(thunk, userApi.middleware, apiModal.middleware),
 });
