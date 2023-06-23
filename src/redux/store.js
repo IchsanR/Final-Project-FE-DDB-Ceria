@@ -20,5 +20,5 @@ export const store = configureStore({
     persistedReducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(thunk, userApi.middleware, apiModal.middleware),
+    getDefaultMiddleware().concat(thunk, userApi.middleware),
 });
