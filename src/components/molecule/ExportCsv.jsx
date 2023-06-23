@@ -14,14 +14,18 @@ const ExportCsv = () => {
     endDate: "",
   });
   const [status, setStatus] = useState("");
+  const [latestDate, setLatestDate] = useState('');
 
+  // date picker
   const handleValueChange = (newValue) => {
-    console.log("newValue:", newValue);
+    // console.log("newValue:", newValue);
     setDate(newValue);
   };
 
+  // get token
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
+  // export data
   const getData = () => {
     const setting = {
       status,
@@ -66,6 +70,18 @@ const ExportCsv = () => {
     getData();
   }, [date, status]);
 
+  // get current date export
+  const handleDownload = () => {
+    const currentDate = new Date().toLocaleDateString('id-ID');
+    setLatestDate(currentDate);
+  };
+
+  // handle export
+  const handleExport = () => {
+      setOpenModal(false);
+      setDate({ ...date, startDate: "", endDate: "" }); 
+      handleDownload();
+  }
 
   return (
     <>
@@ -84,6 +100,7 @@ const ExportCsv = () => {
                 onChange={(e) => setStatus(e.target.value)}>
                 <option value=''>All Export</option>
                 <option value='SUCCESS'>Export status success</option>
+                <option value='WAITING_FOR_DEBITTED'>Export status waitting</option>
               </select>
               <div>
                 <label className='block text-sm font-medium text-gray-900 dark:text-white pb-2'>Choose Date</label>
@@ -93,10 +110,8 @@ const ExportCsv = () => {
           </div>
           <Modal.Footer>
             <Button
-              onClick={() => {
-                return setOpenModal(false), setDate({ ...date, startDate: "", endDate: "" });
-              }}>
-              <CSVLink data={dataCsv} filename='data.csv'>
+              onClick={handleExport}>
+              <CSVLink data={dataCsv} filename={`data_transaction_${latestDate}.csv`}>
                 Export
               </CSVLink>
             </Button>
