@@ -54,9 +54,19 @@ const ExportCsv = () => {
 
   // handle export
   const handleExport = () => {
-      setOpenModal(false);
-      setDate({ ...date, startDate: "", endDate: "" }); 
-      handleDownload();
+    return (
+      setOpenModal(false),
+      setDate({ ...date, startDate: "", endDate: "" }), 
+      handleDownload()
+    )
+  }
+
+  // handle close
+  const handleClose = () => {
+    return (
+      setOpenModal(false),
+      setDate({ ...date, startDate: "", endDate: "" })
+    )
   }
 
   useEffect(() => {
@@ -95,7 +105,7 @@ const ExportCsv = () => {
                 Export
               </CSVLink>
             </Button>
-            <Button color='gray' onClick={() => setOpenModal(false)}>
+            <Button color='gray' onClick={handleClose}>
               Cancel
             </Button>
           </Modal.Footer>
