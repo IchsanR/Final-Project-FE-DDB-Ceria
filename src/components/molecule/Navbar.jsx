@@ -17,11 +17,11 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Logo from "../atom/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { userAvatar } from "../../assets";
+import { Toolbar, Typography } from "@mui/material";
 
 const drawerWidth = 300;
 
-function ResponsiveDrawer(props) {
-  const { window } = props;
+function ResponsiveDrawer({ window, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
@@ -138,6 +138,13 @@ function ResponsiveDrawer(props) {
         >
           {drawer}
         </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+      >
+        <Toolbar />
+        {children}
       </Box>
     </Box>
   );
