@@ -45,11 +45,7 @@ const Login = () => {
 					if (checked === false) {
 						sessionStorage.setItem('token', response.data.data[0].token);
 						sessionStorage.setItem('name', response.data.data[0].name);
-<<<<<<< HEAD
 						cookieStorage.setItem('gin_cookie', response.data.data[0].token)
-=======
-						sessionStorage.setItem('email', response.data.data[0].email);
->>>>>>> 0d8fb6d52fa8455c44b1545d8bba6d6f7392c218
 						return navigate('/');
 					} else {
 						cookieStorage.setItem('gin_cookie', response.data.data[0].token)
