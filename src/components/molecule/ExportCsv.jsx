@@ -59,6 +59,10 @@ const ExportCsv = () => {
       handleDownload();
   }
 
+  useEffect(() => {
+    handleExport();
+  },[])
+
   return (
     <>
       <Button onClick={() => setOpenModal(true)}>Export to csv</Button>
