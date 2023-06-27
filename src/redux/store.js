@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
-import storage from 'redux-persist/lib/storage';
+import storage from "redux-persist/lib/storage";
 import { userApi } from "./api/User";
 import rootReducer from "./reducer/reducer";
 import { persistReducer } from "redux-persist";
