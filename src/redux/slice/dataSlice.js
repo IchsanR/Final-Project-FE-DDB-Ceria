@@ -1,28 +1,36 @@
-// dataSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { backendUrl } from '../../config/env.config';
-export const fetchData = createAsyncThunk('data/fetchData', async (sdate,edate) => {
-    let url =''
-    if(sdate&&edate){
-         url = backendUrl + `/get-transactionsdate/${sdate}/${edate}`
-    }else {
-         url = backendUrl + '/get-transactions-limit/1'
-    }
-    
-  
-    const response = await fetch( url);
+import axios from 'axios';
 
-  const data = await response.json();
-  return data;
+const initialState = {
+  data: [],
+  filteredData: [],
+  status: 'idle',
+  error: null,
+};
+const getToken = () => {
+    return sessionStorage.getItem('token');
+  };
+export const fetchData = createAsyncThunk('data/fetchData', async () => {
+    const token = getToken();
+  const response = await axios.get('http://localhost:8081/api/get-transactions',{
+    headers: { Authorization: `${token}` },
+  })
+  return response.data;
+});
+
+export const filterData = createAsyncThunk('data/filterData', async (params) => {
+  const { status, sdate,edate } = params;
+//   console.log("inidataaaaa"+start,end)
+const token = getToken();
+  const response = await axios.get(`http://localhost:8081/api/getTransactionsStatusDate/${status}/${sdate}/${edate}`,{
+    headers: { Authorization: `${token}` },
+  });
+  return response.data;
 });
 
 const dataSlice = createSlice({
   name: 'data',
-  initialState: {
-    items: [],
-    status: 'idle',
-    error: null,
-  },
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -31,13 +39,30 @@ const dataSlice = createSlice({
       })
       .addCase(fetchData.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload;
+        state.data = action.payload;
+        state.filteredData = action.payload;
       })
       .addCase(fetchData.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(filterData.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(filterData.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.filteredData = action.payload;
+      })
+      .addCase(filterData.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });
   },
 });
 
-export default dataSlice.reducer
+export const selectData = (state) => state.data.data;
+export const selectFilteredData = (state) => state.data.filteredData;
+export const selectDataStatus = (state) => state.data.status;
+export const selectDataError = (state) => state.data.error;
+
+export default dataSlice.reducer;

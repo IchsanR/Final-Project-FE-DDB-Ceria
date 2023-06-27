@@ -1,7 +1,12 @@
 import { NavigasiBar } from "../../components";
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchData } from "../../redux/slice/dataSlice";
+import {
+  fetchData,
+  filterData,
+  selectData,
+  selectFilteredData,
+} from "../../redux/slice/dataSlice";
 import { DataTable } from "primereact/datatable";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Column } from "primereact/column";
@@ -15,23 +20,53 @@ import { Button } from "primereact/button";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
-import "primeflex/primeflex.css"; // css utility
+//import "primeflex/primeflex.css"; // css utility
+import "./Flags.module.css";
 import "./style.css";
-import "./flags.css";
+import ExportCsv from "../../components/molecule/ExportCsv";
 
 const TransactionPage = () => {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.data.items);
-  const status = useSelector((state) => state.data.status);
-  const error = useSelector((state) => state.data.error);
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [filters, setFilters] = useState(null);
-  const [dates, setDates] = useState(null);
-  const [isFilter, setIsFilter] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const data = useSelector(selectData);
+  let filteredData = useSelector(selectFilteredData);
+
   useEffect(() => {
     dispatch(fetchData());
-    initFilters();
   }, [dispatch]);
+
+  const handleFilter = (sdate, edate) => {
+    console.log("inidatasdateedate" + sdate, edate);
+    dispatch(filterData({ status: statusF, sdate, edate }));
+  };
+
+  const handleResetFilter = () => {
+    setStatusF("");
+    setDates(null);
+    setEndDate(null);
+    filteredData = data;
+    dispatch(fetchData());
+  };
+  // const dispatch = useDispatch();
+  // const data = useSelector((state) => state.data.items);
+  const status = useSelector((state) => state.data.status);
+  const error = useSelector((state) => state.data.error);
+  const [filters, setFilters] = useState(null);
+  const [statusF, setStatusF] = useState("");
+  const [dates, setDates] = useState(null);
+  const [isFilter, setIsFilter] = useState(false);
+  const [sDate, setSDate] = useState("");
+  const [eDate, setEDate] = useState("");
+  // useEffect(() => {
+  //   console.log(isFilter)
+  //   if(isFilter){
+  //     dispatch(fetchData(statusF,sDate,eDate));
+  //   }else dispatch(fetchData());
+  //   initFilters();
+  // }, [dispatch]);
 
   // if (status === 'loading') {
   //   setLoading(true)
@@ -109,7 +144,6 @@ const TransactionPage = () => {
   const formatDate = (value) => {
     if (value !== undefined && value !== null) {
       const dateValue = value ? new Date(value) : null;
-      // Now you can safely use toLocaleString()
       // console.log(dateValue);
       return dateValue.toLocaleDateString("en-US", {
         day: "2-digit",
@@ -131,17 +165,8 @@ const TransactionPage = () => {
       />
     );
   };
-  const onGlobalFilterChange = (e) => {
-    const value = e.target.value;
-    let _filters = { ...filters };
-    _filters["global"].value = value;
-
-    setFilters(_filters);
-    setGlobalFilterValue(value);
-  };
   const initFilters = () => {
     setFilters({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       id: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -163,13 +188,26 @@ const TransactionPage = () => {
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
-    setGlobalFilterValue("");
   };
-  const fiterDate = ()=>{
-    const sdate = dates[0]
-    const edate = dates[1]
-    setIsFilter(true)
+  function formatDateF(date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
   }
+  const fiterDate = () => {
+    const sdate = formatDateF(dates[0]);
+    const edate = formatDateF(dates[1]);
+
+    dispatch(filterData(statusF, sdate, edate));
+    handleFilter(sdate.toString(), edate.toString());
+    setSDate(sdate);
+    setEDate(edate);
+    // dispatch(fetchData(statusF, sdate, edate));
+    console.log("inis" + sdate);
+    setIsFilter(true);
+  };
 
   //render header
   const renderHeader = () => {
@@ -177,10 +215,12 @@ const TransactionPage = () => {
       <div className="flex justify-content-between">
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Global Search"
+          <Dropdown
+            value={statusF}
+            options={statuses}
+            onChange={(e) => setStatusF(e.value)}
+            placeholder="Select One"
+            className="p-column-filter"
           />
           <Calendar
             placeholder="Select Range"
@@ -194,11 +234,19 @@ const TransactionPage = () => {
             label="Filter"
             type="submit"
             onClick={fiterDate}
-            icon="pi pi-check"
+            icon="pi pi-filter"
+          />
+          <Button
+            placeholder="Reset Filter"
+            onClick={handleResetFilter}
+            // icon="pi pi-check"
+            icon="pi pi-filter-slash"
+            label="Clear"
+            className="p-button-outlined"
           />
         </span>
         <span>
-          <Button
+          {/* <Button
             tooltip="Export CSV"
             tooltipOptions={{
               position: "bottom",
@@ -224,8 +272,9 @@ const TransactionPage = () => {
             rounded
             onClick={exportExcel}
             data-pr-tooltip="XLS"
-          />
+          /> */}
         </span>
+        <ExportCsv />
       </div>
     );
   };
@@ -273,7 +322,7 @@ const TransactionPage = () => {
           header={header}
           paginator
           rows={10}
-          value={data.data}
+          value={filteredData.code == 200 ? filteredData.data : data.data}
           tableStyle={{ minWidth: "50rem" }}
         >
           <Column field="id" sortable header="Id"></Column>
@@ -303,8 +352,8 @@ const TransactionPage = () => {
             sortable
             style={{ minWidth: "10rem" }}
             body={dateBodyTemplate}
-            filterElement={dateFilterTemplate}
-            filter
+            // filterElement={dateFilterTemplate}
+            // filter
           />
           <Column
             field="status"
