@@ -1,9 +1,10 @@
 import React, { Fragment } from "react";
+import { Navs } from "../../components";
 
 const Home = () => {
 	return (
 		<Fragment>
-			<div>Home</div>
+			<Navs />
 		</Fragment>
 	);
 };

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Buttons, Inputs, Logo } from "../../components";
+import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/User";
 import Swal from "sweetalert2";
+
 
 const Login = () => {
 	const [form, setForm] = useState({
@@ -12,6 +13,7 @@ const Login = () => {
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
 	const [loginUser] = useLoginUserMutation();
+	const [isLogged, setIsLogged] = useState(false);
 
 	const handleChecked = (e) => {
 		e.preventDefault();
@@ -27,10 +29,12 @@ const Login = () => {
 
 	const onSubmit = (e) => {
 		e.preventDefault();
+		setIsLogged(true);
 
 		const handleSuccess = (response) => {
 			if (response.data) {
 				if (response.data.code === 200) {
+					setIsLogged(false);
 					Swal.fire({
 						title: "Success!",
 						text: `Selamat datang ${response.data.data[0].name}`,
@@ -40,16 +44,19 @@ const Login = () => {
 					if (checked === false) {
 						sessionStorage.setItem('token', response.data.data[0].token);
 						sessionStorage.setItem('name', response.data.data[0].name);
+						sessionStorage.setItem('email', response.data.data[0].email);
 						return navigate('/');
 					} else {
 						localStorage.setItem('name', response.data.data[0].name);
 						localStorage.setItem('token', response.data.data[0].token);
+						localStorage.setItem('email', response.data.data[0].email);
 						return navigate('/');
 					}
 				}
 			}
 
 			if (response.error) {
+				setIsLogged(false);
 				return Swal.fire({
 					title: "Error!",
 					text: response.error.data.message,
@@ -94,7 +101,7 @@ const Login = () => {
 						</div>
 					</div>
 					<div className="my-6">
-						<Buttons type={'submit'} classname={'w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900'} description={'Sign In'} />
+						<Buttons type={'submit'} classname={'w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900'} description={!isLogged ? 'Sign In' : <Spinner />} />
 					</div>
 				</form>
 				<div>
