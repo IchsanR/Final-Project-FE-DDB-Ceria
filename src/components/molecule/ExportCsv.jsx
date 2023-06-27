@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal } from "flowbite-react";
 import Datepicker from "react-tailwindcss-datepicker";
 import { CSVLink } from "react-csv";
-import axios from "axios";
 import Swal from "sweetalert2";
-import { backendUrl } from '../../config/env.config';
+import { apiExportCsv } from "../../redux/api/exportCsvApi";
 
 const ExportCsv = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -27,43 +26,20 @@ const ExportCsv = () => {
 
   // export data
   const getData = () => {
-    const setting = {
-      status,
-      startDate: date.startDate,
-      endDate: date.endDate,
-    };
-    return new Promise((resolve, reject) => {
-      axios
-        .get(
-          `${backendUrl}/api/export-transaction/${
-            setting.status && setting.startDate && setting.endDate
-              ? `?status=${setting.status}&start_date=${setting.startDate}&end_date=${setting.endDate}`
-              : setting.status
-              ? `?status=${setting.status}`
-              : ""
-          }`, {
-            headers: {
-              Authorization: `${token}`,
-            }
-          }
-        )
-        .then((res) => {
-          resolve(res);
-          console.log(`start: ${setting.startDate}, end: ${setting.endDate}, status: ${setting.status}`);
-          setDataCsv(res.data);
-        })
-        .catch((err) => {
-          if(err) {
-            Swal.fire({
-              title: "Oops..",
-              text: `data tidak tersedia`,
-              icon: "error",
-              timer: 3000,
-            });
-          }
-          // reject(err);
-        });
-    });
+    apiExportCsv(token, status, date.startDate, date.endDate)
+      .then((res) => {
+        setDataCsv(res.data);
+      })
+      .catch((err) => {
+        if(err) {
+          Swal.fire({
+            title: "Oops..",
+            text: `data tidak tersedia`,
+            icon: "error",
+            timer: 3000,
+          });
+        }
+      });
   };
 
   useEffect(() => {
