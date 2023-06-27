@@ -9,7 +9,7 @@ import { CookieStorage } from "cookie-storage";
 const Login = () => {
 	const [form, setForm] = useState({
 		email: "",
-		password: ''
+		password: ""
 	});
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
@@ -43,16 +43,15 @@ const Login = () => {
 						timer: 3000,
 					});
 					if (checked === false) {
-						sessionStorage.setItem('token', response.data.data[0].token);
-						sessionStorage.setItem('name', response.data.data[0].name);
-						sessionStorage.setItem('email', response.data.data[0].email);
-						return navigate('/');
+						sessionStorage.setItem("token", response.data.data[0].token);
+						sessionStorage.setItem("name", response.data.data[0].name);
+						sessionStorage.setItem("email", response.data.data[0].email);
+						return navigate("/");
 					} else {
-						cookieStorage.setItem('gin_cookie', response.data.data[0].token)
-						localStorage.setItem('name', response.data.data[0].name);
-						localStorage.setItem('token', response.data.data[0].token);
-						localStorage.setItem('email', response.data.data[0].email);
-						return navigate('/');
+						localStorage.setItem("name", response.data.data[0].name);
+						localStorage.setItem("token", response.data.data[0].token);
+						localStorage.setItem("email", response.data.data[0].email);
+						return navigate("/");
 					}
 				}
 			}
@@ -99,15 +98,15 @@ const Login = () => {
 							<label htmlFor="rememberMe" className="text-[#6B7280]">Remember Me</label>
 						</div>
 						<div>
-							<Link to={'/'} className="text-violet-800 font-semibold" >Forgot Password?</Link>
+							<Link to={"/"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
 						</div>
 					</div>
 					<div className="my-6">
-						<Buttons type={'submit'} classname={'w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900'} description={!isLogged ? 'Sign In' : <Spinner />} />
+						<Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isLogged ? "Sign In" : <Spinner />} />
 					</div>
 				</form>
 				<div>
-					<p className="text-[#6B7280]" >Don't have account yet? <span><Link className="text-violet-800 font-semibold" to={'/register'}>Sign Up</Link></span></p>
+					<p className="text-[#6B7280]" >Don"t have account yet? <span><Link className="text-violet-800 font-semibold" to={"/register"}>Sign Up</Link></span></p>
 				</div>
 			</main>
 		</div>

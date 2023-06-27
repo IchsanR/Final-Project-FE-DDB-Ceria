@@ -18,7 +18,7 @@ const routes = [
 
 const Router = () => {
 	const PrivateRoute = () => {
-		const token = localStorage.getItem("token") || sessionStorage.getItem('token');
+		const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 		if (token) {
 			return <Outlet />;
 		} else {
