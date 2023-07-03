@@ -14,7 +14,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = configureStore({
+ const store = configureStore({
   reducer: {
     data: dataReducer,
     persistedReducer
@@ -22,3 +22,5 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(thunk, userApi.middleware),
 });
+
+export default store

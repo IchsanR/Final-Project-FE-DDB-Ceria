@@ -1,4 +1,5 @@
 import { NavigasiBar } from "../../components";
+import { Navs } from "../../components";
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -24,7 +25,7 @@ import "primeicons/primeicons.css"; // icons
 import "./Flags.module.css";
 import "./style.css";
 import ExportCsv from "../../components/molecule/ExportCsv";
-
+import Swal from "sweetalert2";
 const TransactionPage = () => {
   const dispatch = useDispatch();
   const [statusFilter, setStatusFilter] = useState("");
@@ -41,6 +42,23 @@ const TransactionPage = () => {
   const handleFilter = (sdate, edate) => {
     console.log("inidatasdateedate" + sdate, edate);
     dispatch(filterData({ status: statusF, sdate, edate }));
+    // filteredData.data.map((res)=>{
+    //   if(res.length>1){
+    //     Swal.fire({
+    //       title: "Success!",
+    //       text: "Tidak Ada Data",
+    //       icon: "success",
+    //       timer: 3000,
+    //     });
+    //   }else {
+    //     Swal.fire({
+    //       title: "Success!",
+    //       text: "Tidak Ada Data",
+    //       icon: "success",
+    //       timer: 3000,
+    //     });
+    //   }
+    // })
   };
 
   const handleResetFilter = () => {
@@ -49,6 +67,7 @@ const TransactionPage = () => {
     setEndDate(null);
     filteredData = data;
     dispatch(fetchData());
+    initFilters();
   };
   // const dispatch = useDispatch();
   // const data = useSelector((state) => state.data.items);
@@ -105,6 +124,7 @@ const TransactionPage = () => {
         itemTemplate={statusItemTemplate}
         placeholder="Select One"
         className="p-column-filter"
+        showFilterMatchModes={false}
         showClear
       />
     );
@@ -197,16 +217,17 @@ const TransactionPage = () => {
     return `${day}-${month}-${year}`;
   }
   const fiterDate = () => {
+    if(dates){
     const sdate = formatDateF(dates[0]);
     const edate = formatDateF(dates[1]);
 
-    dispatch(filterData(statusF, sdate, edate));
+    // dispatch(filterData(statusF, sdate, edate));
     handleFilter(sdate.toString(), edate.toString());
-    setSDate(sdate);
-    setEDate(edate);
+    // setSDate(sdate);
+    // setEDate(edate);
     // dispatch(fetchData(statusF, sdate, edate));
     console.log("inis" + sdate);
-    setIsFilter(true);
+    }
   };
 
   //render header
@@ -219,15 +240,17 @@ const TransactionPage = () => {
             value={statusF}
             options={statuses}
             onChange={(e) => setStatusF(e.value)}
-            placeholder="Select One"
-            className="p-column-filter"
+            itemTemplate={statusItemTemplate}
+            placeholder="Select Status"
+            className="p-column-filter mr-2 p-inputtext-sm"
           />
           <Calendar
-            placeholder="Select Range"
+            placeholder="Select Range Date *"
             value={dates}
             onChange={(e) => setDates(e.value)}
             selectionMode="range"
             readOnlyInput
+            className="mr-2 p-inputtext-sm"
           />
           <Button
             placeholder="Select Range"
@@ -235,6 +258,7 @@ const TransactionPage = () => {
             type="submit"
             onClick={fiterDate}
             icon="pi pi-filter"
+            className="mr-2 p-button-sm"
           />
           <Button
             placeholder="Reset Filter"
@@ -242,10 +266,10 @@ const TransactionPage = () => {
             // icon="pi pi-check"
             icon="pi pi-filter-slash"
             label="Clear"
-            className="p-button-outlined"
+            className="p-button-outlined mr-2 p-button-sm "
           />
         </span>
-        <span>
+        <span >
           {/* <Button
             tooltip="Export CSV"
             tooltipOptions={{
@@ -258,23 +282,23 @@ const TransactionPage = () => {
             rounded
             onClick={() => exportCSV(false)}
             data-pr-tooltip="CSV"
-          />
+          /> */}
           <Button
             tooltip="Export XLS"
-            tooltipOptions={{
-              position: "bottom",
-              mouseTrack: true,
-              mouseTrackTop: 15,
-            }}
+             tooltipOptions={{ position: 'bottom' }}
             type="button"
             icon="pi pi-file-excel"
             severity="success"
             rounded
             onClick={exportExcel}
             data-pr-tooltip="XLS"
-          /> */}
+            className="mr-2"
+          />
         </span>
-        <ExportCsv />
+        <span>
+          <ExportCsv />
+        </span>
+        
       </div>
     );
   };
@@ -284,7 +308,7 @@ const TransactionPage = () => {
   };
   const exportExcel = () => {
     import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(data.data);
+      const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer = xlsx.write(workbook, {
         bookType: "xlsx",
@@ -315,15 +339,19 @@ const TransactionPage = () => {
 
   return (
     <>
-      <NavigasiBar />
+      {/* <Navs /> */}
       <div className="card">
         <DataTable
           ref={dt}
           header={header}
           paginator
-          rows={10}
+          rows={5}
+          rowsPerPageOptions={[5, 10, 25, 50]}
           value={filteredData.code == 200 ? filteredData.data : data.data}
           tableStyle={{ minWidth: "50rem" }}
+          paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+          currentPageReportTemplate="{first} to {last} of {totalRecords}"
+          scrollable scrollHeight="400px"
         >
           <Column field="id" sortable header="Id"></Column>
           <Column
@@ -333,6 +361,8 @@ const TransactionPage = () => {
             filter
             style={{ width: "25%" }}
             header="Oda Number"
+            filterMatchMode={false}
+            showAddButton={false}
           ></Column>
           <Column
             field="bill_amount"
@@ -365,6 +395,7 @@ const TransactionPage = () => {
             filterElement={statusFilterTemplate}
             header="Status"
             showAddButton={false}
+            showFilterMatchModes={false}
           ></Column>
         </DataTable>
       </div>

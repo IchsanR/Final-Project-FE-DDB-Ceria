@@ -17,15 +17,16 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Logo from "../atom/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { userAvatar } from "../../assets";
+import { Toolbar, Typography } from "@mui/material";
 
 const drawerWidth = 300;
 
-function ResponsiveDrawer(props) {
-  const { window } = props;
+function ResponsiveDrawer({ window, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
-  const email = localStorage.getItem("email") || sessionStorage.getItem("email");
+  const email =
+    localStorage.getItem("email") || sessionStorage.getItem("email");
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -80,7 +81,8 @@ function ResponsiveDrawer(props) {
     </div>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -100,7 +102,11 @@ function ResponsiveDrawer(props) {
             <MenuIcon />
           </IconButton>
           <div className="flex items-center">
-            <img src={userAvatar} alt="user" className="w-9 sm:w-12 h-9 sm:h-12" />
+            <img
+              src={userAvatar}
+              alt="user"
+              className="w-9 sm:w-12 h-9 sm:h-12"
+            />
             <div className="ml-3">
               <p>{name}</p>
               <p className="text-slate-500">{email}</p>
@@ -123,7 +129,10 @@ function ResponsiveDrawer(props) {
           }}
           sx={{
             display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
@@ -132,12 +141,26 @@ function ResponsiveDrawer(props) {
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >
           {drawer}
         </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+        }}
+      >
+        <Toolbar />
+        {children}
       </Box>
     </Box>
   );

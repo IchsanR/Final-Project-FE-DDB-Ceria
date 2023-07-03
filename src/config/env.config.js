@@ -1,3 +1,3 @@
-const backendUrl = 'http://localhost:8081'
+const backendUrl = 'https://ddb-ceria-backend-production.up.railway.app/'
 
 export {backendUrl}

@@ -1,9 +1,10 @@
 import NotFound from "../pages/NotFound";
 import { Home, Login, Register, TransactionPage } from "../pages";
+import { Navs } from "../components";
 
 const routes = [
 	{
-		elements: <Home />,
+		elements: <Navs children={<Home/>} />,
 		path: "/",
 		layout: true,
 	},
