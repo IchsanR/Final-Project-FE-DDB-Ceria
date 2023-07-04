@@ -16,7 +16,7 @@ const getToken = () => {
 export const fetchData = createAsyncThunk("data/fetchData", async (page) => {
   const token = getToken();
   const response = await axios.get(backendUrl +
-     `api/get-transactions-limit/${page}`,
+     `/api/get-transactions-limit/${page}`,
     // "api/get-transactions",
     {
       headers: { Authorization: `${token}` },
@@ -33,7 +33,7 @@ export const filterData = createAsyncThunk(
     const { status, sdate, edate } = params;
     if (status === "" && sdate !=="") {
       const response = await axios.get(backendUrl +
-        `api/getTransactionsDate/${sdate}/${edate}`,
+        `/api/getTransactionsDate/${sdate}/${edate}`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -41,7 +41,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     } else if (status !== "" && sdate === "") {
       const response = await axios.get(backendUrl +
-        `api/getTransactions/${status}`,
+        `/api/getTransactions/${status}`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -49,7 +49,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     }else if (status  && sdate !== "") {
       const response = await axios.get(backendUrl +
-        `api/getTransactionsStatusDate/${status}/${sdate}/${edate}`,
+        `/api/getTransactionsStatusDate/${status}/${sdate}/${edate}`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -57,7 +57,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     }else {
       const response = await axios.get(backendUrl +
-        "api/get-transactions",
+        "/api/get-transactions",
         {
           headers: { Authorization: `${token}` },
         }

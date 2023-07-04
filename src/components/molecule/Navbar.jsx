@@ -17,9 +17,9 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Logo from "../atom/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { userAvatar } from "../../assets";
-import { Toolbar, Typography } from "@mui/material";
+import { Toolbar } from "@mui/material";
 
-const drawerWidth = 300;
+const drawerWidth = 250;
 
 function ResponsiveDrawer({ window, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);

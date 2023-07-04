@@ -1,3 +1,3 @@
-const backendUrl = 'https://ddb-ceria-backend-production.up.railway.app/'
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 export {backendUrl}
