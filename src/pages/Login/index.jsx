@@ -3,7 +3,6 @@ import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/User";
 import Swal from "sweetalert2";
-import { CookieStorage } from "cookie-storage";
 
 
 const Login = () => {
