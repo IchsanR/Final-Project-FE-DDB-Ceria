@@ -1,10 +1,9 @@
-import { Navs } from "../components";
-import { Home, Login, Register } from "../pages";
+import { Home, Login, Register, Verificationpage } from "../pages";
 import NotFound from "../pages/NotFound";
 
 const routes = [
 	{
-		elements: <Navs children={<Home />} />,
+		elements: <Home />,
 		path: "/",
 		layout: true,
 	},
@@ -23,6 +22,12 @@ const routes = [
 		path: "*",
 		layout: false,
 	},
+	{
+		elements: <Verificationpage />,
+		path: "verificationpage",
+		layout: false,
+	},
+	
 ];
 
 export default routes;
