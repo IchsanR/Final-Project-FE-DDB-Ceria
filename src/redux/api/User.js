@@ -19,7 +19,28 @@ export const userApi = createApi({
         body,
       }),
     }),
+    sendEmailVerification: builder.mutation({
+      query: (email) => ({
+        url: `/send-email-registration/${email}`,
+        method: "POST",
+      }),
+      transformResponse: (response) => {
+        return { code: response.code, data: response.data };
+      },
+    }),
+    compareVerificationCode: builder.mutation({
+      query: ({ email, code }) => ({
+        url: "/compare-verification-code",
+        method: "POST",
+        body: { email, code },
+      }),
+    }),
   }),
 });
 
-export const { useLoginUserMutation, useRegisterUserMutation } = userApi;
+export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+  useSendEmailVerificationMutation,
+  useCompareVerificationCodeMutation,
+} = userApi;

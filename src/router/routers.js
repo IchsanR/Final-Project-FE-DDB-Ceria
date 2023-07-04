@@ -1,5 +1,5 @@
 import NotFound from "../pages/NotFound";
-import { Home, Login, Register, TransactionPage } from "../pages";
+import { Home, Login, Register, TransactionPage,Verificationpage } from "../pages";
 import { Navs } from "../components";
 
 const routes = [
@@ -26,6 +26,11 @@ const routes = [
 	{
 		elements: <TransactionPage />,
 		path: "transaction-page",
+		layout: false,
+	},
+	{
+		elements: <Verificationpage />,
+		path: "verificationpage",
 		layout: false,
 	},
 	
