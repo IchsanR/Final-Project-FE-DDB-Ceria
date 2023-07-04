@@ -85,7 +85,7 @@ function ResponsiveDrawer({ window, children }) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", zIndex: -999 }}>
       <AppBar
         position="fixed"
         className={`md:shadow-none bg-white border h-20 text-black sm:w-[calc(100% - ${drawerWidth}px)] sm:ml-[${drawerWidth}px]`}

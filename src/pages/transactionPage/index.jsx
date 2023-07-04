@@ -356,7 +356,7 @@ const TransactionPage = () => {
     });
   };
   const paginatorRight = <Button type="button" icon="pi pi-eye" label="Show all" text onClick={handleShowAll} />;
-  const paginatorLeft = <Button type="button" icon="pi pi-download" text onClick={exportExcel} tooltip="Export XLS"
+  const paginatorLeft = <Button type="button" icon="pi pi-download "  text onClick={exportExcel} tooltip="Export XLS"
   tooltipOptions={{ position: 'bottom' }} />;
   const header = renderHeader();
 
