@@ -1,8 +1,6 @@
-import { NavigasiBar } from "../../components";
-import { Navs } from "../../components";
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Paginator } from 'primereact/paginator';
+import { Paginator } from "primereact/paginator";
 import {
   fetchData,
   filterData,
@@ -10,36 +8,24 @@ import {
   selectFilteredData,
 } from "../../redux/slice/dataSlice";
 import { DataTable } from "primereact/datatable";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
-import { InputText } from "primereact/inputtext";
-import { MultiSelect } from "primereact/multiselect";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import { Toast } from 'primereact/toast';
+import { Toast } from "primereact/toast";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
-//import "primeflex/primeflex.css"; // css utility
 import "./Flags.module.css";
 import "./style.css";
 import ExportCsv from "../../components/molecule/ExportCsv";
-import Swal from "sweetalert2";
-import { ProgressSpinner } from 'primereact/progressspinner';
 const TransactionPage = () => {
   const toast = useRef(null);
   const dispatch = useDispatch();
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(100);
-  // const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-
-  // const data = useSelector(selectData);
   const { data } = useSelector(selectData);
   const { totalPages, loading, error } = useSelector((state) => state.data);
   let filteredData = useSelector(selectFilteredData);
@@ -47,74 +33,46 @@ const TransactionPage = () => {
   useEffect(() => {
     setTimeout(() => {
       dispatch(fetchData(1));
-      //setLoading(false);
     }, 200);
-    console.log("ini" + totalPages)
   }, [dispatch]);
 
   const onPageChange = (event) => {
-    console.log("ec" + event.page)
     dispatch(fetchData(event.page + 1));
     setFirst(event.first);
     setRows(event.rows);
   };
 
-  const loader = (
-    <div className="loading-spinner">
-      <ProgressSpinner />
-    </div>
-  );
-
   const handleFilter = (sdate, edate) => {
-     dispatch(filterData({ status: statusF, sdate, edate })); 
+    dispatch(filterData({ status: statusF, sdate, edate }));
   };
   const handleShowAll = () => {
-     dispatch(filterData({}))
+    dispatch(filterData({}));
   };
 
   const handleResetFilter = () => {
     setStatusF("");
     setDates(null);
-    setEndDate(null);
-    setFirst(0)
-    setRows(100)
+    setFirst(0);
+    setRows(100);
     filteredData = data;
     dispatch(fetchData(1));
-    initFilters();
-    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Filter Cleared', life: 3000 });
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Filter Cleared",
+      life: 3000,
+    });
   };
-  // const dispatch = useDispatch();
-  // const data = useSelector((state) => state.data.items);
-  const status = useSelector((state) => state.data.status);
-  // const error = useSelector((state) => state.data.error);
-  const [filters, setFilters] = useState(null);
+
   const [statusF, setStatusF] = useState("");
   const [dates, setDates] = useState(null);
-  // useEffect(() => {
-  //   console.log(isFilter)
-  //   if(isFilter){
-  //     dispatch(fetchData(statusF,sDate,eDate));
-  //   }else dispatch(fetchData());
-  //   initFilters();
-  // }, [dispatch]);
 
-  // if (status === 'loading') {
-  //   setLoading(true)
-  // }
-
-  // if (status === 'failed') {
-  //   return <div>Error: {error}</div>;
-  // }
-
-  //custom status
   const getSeverity = (status) => {
     switch (status) {
       case "failed":
         return "danger";
-
       case "SUCCESS":
         return "success";
-
       case "WAITING_FOR_DEBITTED":
         return "warning";
     }
@@ -143,7 +101,6 @@ const TransactionPage = () => {
   const statusItemTemplate = (option) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
-
   //custom price
   const balanceBodyTemplate = (rowData) => {
     return formatCurrency(rowData.bill_amount);
@@ -175,7 +132,6 @@ const TransactionPage = () => {
   const formatDate = (value) => {
     if (value !== undefined && value !== null) {
       const dateValue = value ? new Date(value) : null;
-      // console.log(dateValue);
       return dateValue.toLocaleDateString("en-US", {
         day: "2-digit",
         month: "2-digit",
@@ -183,52 +139,14 @@ const TransactionPage = () => {
       });
     }
   };
-  //filtering date
-  const dateFilterTemplate = (options) => {
-    // console.log("dateov" + options.value);
-    return (
-      <Calendar
-        value={options.value}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-      />
-    );
-  };
-  const initFilters = () => {
-    setFilters({
-      id: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      oda_number: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      created_at: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
-      },
-      bill_amount: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-      },
-      status: {
-        operator: FilterOperator.OR,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-      },
-    });
-  };
+
   function formatDateF(date) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-
     return `${day}-${month}-${year}`;
   }
   const fiterDate = () => {
-    //setLoading(true);
     if (dates || statusF !== "") {
       let sdate = "";
       let edate = "";
@@ -236,17 +154,16 @@ const TransactionPage = () => {
         sdate = formatDateF(dates[0]);
         edate = formatDateF(dates[1]);
       }
-      // dispatch(filterData(statusF, sdate, edate));
       handleFilter(sdate, edate);
-      // setSDate(sdate);
-      // setEDate(edate);
-      // dispatch(fetchData(statusF, sdate, edate));
-      console.log("inis" + sdate);
     } else {
-      toast.current.show({ severity: 'warn', summary: 'warning', detail: 'Please Select Filter', life: 3000 });
+      toast.current.show({
+        severity: "warn",
+        summary: "warning",
+        detail: "Please Select Filter",
+        life: 3000,
+      });
     }
   };
-
 
   //render header
   const renderHeader = () => {
@@ -278,7 +195,6 @@ const TransactionPage = () => {
             onClick={fiterDate}
             className="p-button-sm md:ml-2"
             icon="pi pi-filter"
-          // disabled={loading}
           />
           <Button
             placeholder="Reset Filter"
@@ -291,7 +207,7 @@ const TransactionPage = () => {
         <div className="mt-2 md:mt-0">
           <Button
             tooltip="Export XLS"
-            tooltipOptions={{ position: 'bottom' }}
+            tooltipOptions={{ position: "bottom" }}
             type="button"
             icon="pi pi-file-excel"
             severity="success"
@@ -306,16 +222,13 @@ const TransactionPage = () => {
     );
   };
   const dt = useRef(null);
-  const exportCSV = (selectionOnly) => {
-    dt.current.exportCSV({ selectionOnly });
-  };
   const exportExcel = () => {
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
-  
+
       // Get the range of the column to convert to string
       const columnRange = "D2:D" + (filteredData.data.length + 1);
-  
+
       // Iterate over the range and convert each cell to string
       for (let rowNum = 2; rowNum <= filteredData.data.length + 1; rowNum++) {
         const cellRefB = "B" + rowNum;
@@ -327,14 +240,13 @@ const TransactionPage = () => {
         cellC.t = "s"; // Set the cell type to string
         cellC.v = String(cellC.v); // Convert the cell value to string
       }
-      
-  
+
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer = xlsx.write(workbook, {
         bookType: "xlsx",
         type: "array",
       });
-  
+
       saveAsExcelFile(excelBuffer, "data-transaction");
     });
   };
@@ -355,9 +267,25 @@ const TransactionPage = () => {
       }
     });
   };
-  const paginatorRight = <Button type="button" icon="pi pi-eye" label="Show all" text onClick={handleShowAll} />;
-  const paginatorLeft = <Button type="button" icon="pi pi-download "  text onClick={exportExcel} tooltip="Export XLS"
-  tooltipOptions={{ position: 'bottom' }} />;
+  const paginatorRight = (
+    <Button
+      type="button"
+      icon="pi pi-eye"
+      label="Show all"
+      text
+      onClick={handleShowAll}
+    />
+  );
+  const paginatorLeft = (
+    <Button
+      type="button"
+      icon="pi pi-download hidden"
+      text
+      onClick={exportExcel}
+      tooltip="Export XLS"
+      tooltipOptions={{ position: "bottom" }}
+    />
+  );
   const header = renderHeader();
 
   return (
@@ -371,19 +299,15 @@ const TransactionPage = () => {
           paginator
           rows={5}
           loading={loading}
-          loader={loader}
           rowsPerPageOptions={[5, 10, 25, 50]}
           value={filteredData.code == 200 ? filteredData.data : data}
           tableStyle={{ minWidth: "50rem" }}
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
-          scrollable scrollHeight="400px"
+          scrollable
+          scrollHeight="400px"
           paginatorRight={paginatorRight}
           paginatorLeft={paginatorLeft}
-        // emptyMessage={error ? error : "Data Not Found" }
-        // totalRecords={totalPages}
-        // onPage={onPageChange}
-
         >
           <Column field="id" sortable header="Id"></Column>
           <Column
@@ -414,8 +338,6 @@ const TransactionPage = () => {
             sortable
             style={{ minWidth: "5rem" }}
             body={dateBodyTemplate}
-          // filterElement={dateFilterTemplate}
-          // filter
           />
           <Column
             field="status"
@@ -431,11 +353,13 @@ const TransactionPage = () => {
           ></Column>
         </DataTable>
         <Paginator
-          first={first} rows={rows}
+          first={first}
+          rows={rows}
           template="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
           totalRecords={filteredData.code == 200 ? totalPages : totalPages}
-          onPageChange={onPageChange} />
+          onPageChange={onPageChange}
+        />
       </div>
     </>
   );
