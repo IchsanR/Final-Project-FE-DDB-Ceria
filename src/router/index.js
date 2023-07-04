@@ -11,7 +11,7 @@ import routers from "./routers";
 
 const Router = () => {
 	const PrivateRoute = () => {
-		const token = localStorage.getItem("token") || sessionStorage.getItem('token');
+		const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 		if (token) {
 			return <Outlet />;
 		} else {
@@ -27,17 +27,16 @@ const Router = () => {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/">
-					{routers.map((item) => (
+					{routers.map((item, i) => (
 						<>
 							{item.layout === true ? (
-								<Route key={item.elements} element={<PrivateRoute />}>
+								<Route key={i} element={<PrivateRoute />}>
 									<Route index element={item.elements} path={item.path} />
 								</Route>
 							) : (
 								<Route
 									path={item.path}
 									element={item.elements}
-									key={item.elements}
 								/>
 							)}
 						</>
