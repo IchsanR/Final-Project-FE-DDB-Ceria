@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
-import { useRegisterUserMutation } from "../../redux/api/User";
 import Swal from "sweetalert2";
 import zxcvbn from "zxcvbn";
 
