@@ -14,7 +14,7 @@ import "primeicons/primeicons.css"; // icons
 const Home = () => {
   const dispatch = useDispatch();
   const { data } = useSelector(selectData);
-  const homeData = data.slice(0, 5);
+  
 
   useEffect(() => {
       dispatch(fetchData(1));
@@ -68,6 +68,7 @@ const Home = () => {
       });
     }
   };
+  const homeData = data.slice(0, 10);
 
 	return (
 		<Fragment>

@@ -109,7 +109,7 @@ const dataSlice = createSlice({
   },
 });
 
-export const selectData = (state) => state.data.data;
+export const selectData = (state) => state.data.data
 export const totalPages = (state) => state.totalPages;
 export const selectFilteredData = (state) => state.data.filteredData;
 export const selectDataStatus = (state) => state.data.status;
