@@ -10,7 +10,7 @@ import { Logo, Buttons } from "../../components";
 
 const Verificationpage = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
-  const [resendTimer, setResendTimer] = useState(30); // Timer mundur 5 detik
+  const [resendTimer, setResendTimer] = useState(15); // Timer mundur 5 detik
   const location = useLocation();
   const navigate = useNavigate();
   const email = localStorage.getItem("verificationEmail");
@@ -95,7 +95,7 @@ const Verificationpage = () => {
 
       await sendEmailVerification(email);
 
-      setResendTimer(30);
+      setResendTimer(15);
 
       Swal.fire({
         title: "Tautan Verifikasi Terkirim",
