@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
-import { useLoginUserMutation } from "../../redux/api/user";
 import Swal from "sweetalert2";
 
 
@@ -10,7 +9,6 @@ const ForgetPassword = () => {
     email: "",
   });
   const navigate = useNavigate();
-  const [loginUser] = useLoginUserMutation();
   const [isLogged, setIsLogged] = useState(false);
 
   const onSubmit = (e) => {
@@ -41,11 +39,6 @@ const ForgetPassword = () => {
         });
       }
     };
-
-    loginUser(form)
-      .then((response) => {
-        handleSuccess(response);
-      });
   };
 
   return (

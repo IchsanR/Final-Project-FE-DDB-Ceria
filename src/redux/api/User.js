@@ -5,7 +5,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const loginUser = createAsyncThunk('loginUser', ({ form, handleSuccess }) => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${backendUrl}/login`, form)
+      .post(`${backendUrl}/login`, form)
       .then((response) => {
         handleSuccess(response);
         resolve(response);
