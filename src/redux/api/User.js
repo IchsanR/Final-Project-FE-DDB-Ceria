@@ -29,12 +29,13 @@ export const registerUser = createAsyncThunk('registerUser', ({ form }) => {
   });
 });
 
-export const sendEmailVerification = createAsyncThunk('sendEmailVerification', ({ email }) => {
+export const sendEmailVerification = createAsyncThunk('sendEmailVerification', ({ email, handleSuccess }) => {
   return new Promise((resolve, reject) => {
     axios
       .post(`${backendUrl}/send-email-registration/${email}`)
       .then((response) => {
         resolve(response);
+        handleSuccess(response.data);
       })
       .catch((error) => {
         reject(error);
