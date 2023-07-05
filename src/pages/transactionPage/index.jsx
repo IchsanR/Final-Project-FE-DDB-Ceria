@@ -18,9 +18,8 @@ import { Toast } from "primereact/toast";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
-import "./Flags.module.css";
-import "./style.css";
 import ExportCsv from "../../components/molecule/ExportCsv";
+
 const TransactionPage = () => {
   const toast = useRef(null);
   const dispatch = useDispatch();
@@ -29,11 +28,12 @@ const TransactionPage = () => {
   const { data } = useSelector(selectData);
   const { totalPages, loading, error } = useSelector((state) => state.data);
   let filteredData = useSelector(selectFilteredData);
+  const [showPaginator, setShowPaginator] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
+    //setTimeout(() => {
       dispatch(fetchData(1));
-    }, 200);
+   // }, 200);
   }, [dispatch]);
 
   const onPageChange = (event) => {
@@ -44,9 +44,11 @@ const TransactionPage = () => {
 
   const handleFilter = (sdate, edate) => {
     dispatch(filterData({ status: statusF, sdate, edate }));
+    setShowPaginator(false);
   };
   const handleShowAll = () => {
     dispatch(filterData({}));
+    setShowPaginator(false);
   };
 
   const handleResetFilter = () => {
@@ -62,6 +64,7 @@ const TransactionPage = () => {
       detail: "Filter Cleared",
       life: 3000,
     });
+    setShowPaginator(true);
   };
 
   const [statusF, setStatusF] = useState("");
@@ -103,7 +106,7 @@ const TransactionPage = () => {
   };
   //custom price
   const balanceBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.bill_amount);
+    return formatCurrency(rowData.price);
   };
   const formatCurrency = (value) => {
     if (value !== undefined && value !== null) {
@@ -193,7 +196,7 @@ const TransactionPage = () => {
             label="Filter"
             type="submit"
             onClick={fiterDate}
-            className="p-button-sm md:ml-2"
+            className="p-button-sm md:ml-2 bg-violet-800"
             icon="pi pi-filter"
           />
           <Button
@@ -201,7 +204,7 @@ const TransactionPage = () => {
             onClick={handleResetFilter}
             icon="pi pi-filter-slash"
             label="Clear"
-            className="p-button-outlined md:ml-2 p-button-sm"
+            className="p-button-outlined md:ml-2 p-button-sm text-violet-800"
           />
         </div>
         <div className="mt-2 md:mt-0">
@@ -274,6 +277,7 @@ const TransactionPage = () => {
       label="Show all"
       text
       onClick={handleShowAll}
+      className="text-violet-800"
     />
   );
   const paginatorLeft = (
@@ -296,7 +300,7 @@ const TransactionPage = () => {
         <DataTable
           ref={dt}
           header={header}
-          paginator
+          paginator={!showPaginator}
           rows={5}
           loading={loading}
           rowsPerPageOptions={[5, 10, 25, 50]}
@@ -305,9 +309,12 @@ const TransactionPage = () => {
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
           scrollable
-          scrollHeight="400px"
+          scrollHeight="430px"
           paginatorRight={paginatorRight}
           paginatorLeft={paginatorLeft}
+          emptyMessage={"No data found, please click show all to found your data"}
+          sortField="id" 
+          sortOrder={-1}
         >
           <Column field="id" sortable header="Id"></Column>
           <Column
@@ -352,14 +359,18 @@ const TransactionPage = () => {
             showFilterMatchModes={false}
           ></Column>
         </DataTable>
-        <Paginator
-          first={first}
-          rows={rows}
-          template="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          currentPageReportTemplate="{first} to {last} of {totalRecords}"
-          totalRecords={filteredData.code == 200 ? totalPages : totalPages}
-          onPageChange={onPageChange}
-        />
+        {showPaginator && (
+          <Paginator
+            first={first}
+            rows={rows}
+            template="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+            currentPageReportTemplate="{first} to {last} of {totalRecords}"
+            totalRecords={filteredData.code == 200 ? totalPages : totalPages}
+            onPageChange={onPageChange}
+            rightContent={paginatorRight}
+            leftContent={paginatorLeft}
+          />
+        )}
       </div>
     </>
   );

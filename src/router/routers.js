@@ -24,7 +24,7 @@ const routes = [
 		layout: false,
 	},
 	{
-		elements: <TransactionPage />,
+		elements: <Navs children={<TransactionPage/>} />,
 		path: "transaction-page",
 		layout: false,
 	},

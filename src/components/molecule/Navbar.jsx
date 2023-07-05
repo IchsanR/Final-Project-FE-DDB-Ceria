@@ -46,7 +46,7 @@ function ResponsiveDrawer({ window, children }) {
         <Logo width={"md:w-[90px] w-[60px]"} height={"md:h-[30px] h-[20px]"} />
       </div>
       <List>
-        <Link>
+        <Link to={"/"}>
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -56,7 +56,7 @@ function ResponsiveDrawer({ window, children }) {
             </ListItemButton>
           </ListItem>
         </Link>
-        <Link>
+        <Link to={"/transaction-page"}>
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemIcon>

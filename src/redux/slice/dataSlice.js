@@ -33,7 +33,7 @@ export const filterData = createAsyncThunk(
     const { status, sdate, edate } = params;
     if (status === "" && sdate !=="") {
       const response = await axios.get(backendUrl +
-        `/api/getTransactionsDate/${sdate}/${edate}`,
+        `/api/get-TransactionDate/${sdate}/${edate}/`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -41,7 +41,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     } else if (status !== "" && sdate === "") {
       const response = await axios.get(backendUrl +
-        `/api/getTransactions/${status}`,
+        `/api/get-transaction-status/${status}/`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -49,7 +49,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     }else if (status  && sdate !== "") {
       const response = await axios.get(backendUrl +
-        `/api/getTransactionsStatusDate/${status}/${sdate}/${edate}`,
+        `/api/get-TransactionStatusDate/${status}/${sdate}/${edate}/`,
         {
           headers: { Authorization: `${token}` },
         }
@@ -57,7 +57,7 @@ export const filterData = createAsyncThunk(
       return response.data;
     }else {
       const response = await axios.get(backendUrl +
-        "/api/get-transactions",
+        "/api/get-transactions/",
         {
           headers: { Authorization: `${token}` },
         }
@@ -84,7 +84,7 @@ const dataSlice = createSlice({
         state.status = "succeeded";
         state.data = action.payload;
         state.filteredData = action.payload;
-        state.totalPages = Math.ceil(action.payload['Jumlah Semua Data'] );
+        state.totalPages = Math.ceil(action.payload['total_data'] );
         console.log(state.totalPages)
       })
       .addCase(fetchData.rejected, (state, action) => {
