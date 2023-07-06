@@ -1,4 +1,4 @@
-import { Home, Login, Register, Verificationpage } from "../pages";
+import { ForgetPassword, Home, Login, Register, Verificationpage } from "../pages";
 import NotFound from "../pages/NotFound";
 
 const routes = [
@@ -27,7 +27,11 @@ const routes = [
 		path: "verificationpage",
 		layout: false,
 	},
-	
+	{
+		elements: <ForgetPassword />,
+		path: "forgot-password",
+		layout: false,
+	},
 ];
 
 export default routes;

@@ -1,16 +1,13 @@
-import React, { useState, Fragment } from "react";
-import { Buttons, Inputs, Logo, Spinner, Passwordshowhide } from "../../components";
+import React, { useState } from "react";
+import { Buttons, Inputs, Logo, Spinner, Passwordshowhide, Modal } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  useSendEmailVerificationMutation,
-  useRegisterUserMutation,
-} from "../../redux/api/User";
 import Swal from "sweetalert2";
 import zxcvbn from "zxcvbn";
-import Modal from "../../components/modals/Modal";
-
+import { useDispatch } from "react-redux";
+import { sendEmailVerification } from "../../redux/api/user";
 
 const Register = () => {
+  const dispatch = useDispatch();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -25,8 +22,6 @@ const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [sendEmailVerification] = useSendEmailVerificationMutation();
-  const [registerUser] = useRegisterUserMutation();
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
@@ -96,43 +91,46 @@ const Register = () => {
 
     try {
       setLoading(true);
-
       const email = form.email;
-      const verificationResponse = await sendEmailVerification(email).unwrap();
 
-      if (verificationResponse && verificationResponse.code === 200) {
-        Swal.fire({
-          title: "Pendaftaran Berhasil",
-          text: `Silakan periksa email Anda ${form.name} untuk verifikasi.`,
-          icon: "success",
-          timer: 10000,
-        });
+      const handleSuccess = (response) => {
+        console.log(response);
+        if (response.code === 200) {
+          Swal.fire({
+            title: "Pendaftaran Berhasil",
+            text: `Silakan periksa email Anda ${form.name} untuk verifikasi.`,
+            icon: "success",
+            timer: 10000,
+          });
 
-        localStorage.setItem("verificationEmail", email);
-        localStorage.setItem("name", form.name);
-        localStorage.setItem("email", form.email);
-        localStorage.setItem("phone", form.phone);
-        localStorage.setItem("password", form.password);
-        localStorage.setItem("role", form.role);
+          localStorage.setItem("verificationEmail", email);
+          localStorage.setItem("name", form.name);
+          localStorage.setItem("email", form.email);
+          localStorage.setItem("phone", form.phone);
+          localStorage.setItem("password", form.password);
+          localStorage.setItem("role", form.role);
 
-        navigate("/verificationpage");
-      } else if (verificationResponse && verificationResponse.code === 400) {
-        Swal.fire({
-          title: "Error!",
-          text: "Email telah digunakan",
-          icon: "error",
-          showConfirmButton: true,
-          confirmButtonText: "OK!",
-        });
-      } else {
-        Swal.fire({
-          title: "Error!",
-          text: "Gagal mengirim email verifikasi",
-          timer: 2500,
-          icon: "error",
-          showConfirmButton: false,
-        });
-      }
+          navigate("/verificationpage");
+        } else if (response.code === 400) {
+          Swal.fire({
+            title: "Error!",
+            text: "Emailtelah digunakan",
+            icon: "error",
+            showConfirmButton: true,
+            confirmButtonText: "OK!",
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: "Gagal mengirim email verifikasi",
+            timer: 2500,
+            icon: "error",
+            showConfirmButton: false,
+          });
+        }
+      };
+
+      await dispatch(sendEmailVerification({ email, handleSuccess }));
     } catch (error) {
       Swal.fire({
         title: "Error!",
@@ -239,7 +237,7 @@ const Register = () => {
                         ? "Kuat"
                         : passwordStrength.score === 2
                         ? "Sedang"
-                        : "Lemah"}
+                       : "Lemah"}
                     </span>
                   </div>
                 </div>

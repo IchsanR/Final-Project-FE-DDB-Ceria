@@ -1,5 +1,6 @@
+import ForgetPassword from "./ForgetPassword";
 import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
 import Verificationpage from "./Register/Verificationpage";
-export { Home, Login, Register, Verificationpage };
+export { Home, Login, Register, Verificationpage, ForgetPassword };
