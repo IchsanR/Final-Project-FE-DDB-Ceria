@@ -43,15 +43,19 @@ export const sendEmailVerification = createAsyncThunk('sendEmailVerification', (
   });
 });
 
-export const compareVerificationCode = createAsyncThunk('compareVerifCode', ({ form }) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${backendUrl}/compare-verification-code`, form)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-});
+export const compareVerificationCode = createAsyncThunk(
+  "compareVerificationCode",
+  async ({ email, code }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/compare-verification-code`,
+        { email, code }
+      );
+
+      return response.data; // Mengembalikan respons dari server
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+

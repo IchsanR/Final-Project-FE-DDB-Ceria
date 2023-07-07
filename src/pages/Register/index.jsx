@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import { Buttons, Inputs, Logo, Spinner, Passwordshowhide, Modal } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -52,7 +52,7 @@ const Register = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.name || !form.email || !form.phone || !form.password) {
@@ -110,11 +110,11 @@ const Register = () => {
           localStorage.setItem("password", form.password);
           localStorage.setItem("role", form.role);
 
-          // navigate("/verificationpage");
+          navigate("/verificationpage");
         } else if (response.code === 400) {
           Swal.fire({
             title: "Error!",
-            text: "Email telah digunakan",
+            text: "Emailtelah digunakan",
             icon: "error",
             showConfirmButton: true,
             confirmButtonText: "OK!",
@@ -130,8 +130,7 @@ const Register = () => {
         }
       };
 
-      dispatch(sendEmailVerification({ email, handleSuccess }));
-
+      await dispatch(sendEmailVerification({ email, handleSuccess }));
     } catch (error) {
       Swal.fire({
         title: "Error!",
@@ -226,30 +225,32 @@ const Register = () => {
                   </div>
                   <div className="text-right">
                     <span
-                      className={`text-sm font-semibold inline-block ${passwordStrength.score >= 3
-                        ? "text-green-500"
-                        : passwordStrength.score === 2
+                      className={`text-sm font-semibold inline-block ${
+                        passwordStrength.score >= 3
+                          ? "text-green-500"
+                          : passwordStrength.score === 2
                           ? "text-orange-500"
                           : "text-red-500"
-                        }`}
+                      }`}
                     >
                       {passwordStrength.score >= 3
                         ? "Kuat"
                         : passwordStrength.score === 2
-                          ? "Sedang"
-                          : "Lemah"}
+                        ? "Sedang"
+                       : "Lemah"}
                     </span>
                   </div>
                 </div>
                 <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
                   <div
                     style={{ width: `${(passwordStrength.score + 1) * 20}%` }}
-                    className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${passwordStrength.score >= 3
-                      ? "bg-green-500"
-                      : passwordStrength.score === 2
+                    className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
+                      passwordStrength.score >= 3
+                        ? "bg-green-500"
+                        : passwordStrength.score === 2
                         ? "bg-orange-500"
                         : "bg-red-500"
-                      }`}
+                    }`}
                   ></div>
                 </div>
                 <div className="text-sm text-gray-500">
@@ -284,8 +285,9 @@ const Register = () => {
           <div className="my-6">
             <Buttons
               type="submit"
-              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               description={
                 loading ? (
                   <div className="flex items-center justify-center">
