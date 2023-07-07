@@ -10,17 +10,17 @@ const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isLogged, setIsLogged] = useState(false);
+  const [isSent, setIsSent] = useState(false);
 
   const onSubmit = (e) => {
     try {
       e.preventDefault();
-      setIsLogged(true);
+      setIsSent(true);
 
       const handleSuccess = (response) => {
         console.log(response);
         if (response.code === 200) {
-          setIsLogged(false);
+          setIsSent(false);
           Swal.fire({
             title: "Verification code sent!",
             text: `Please check your email`,
@@ -28,7 +28,7 @@ const ForgetPassword = () => {
             timer: 3000,
           });
         } else {
-          setIsLogged(false);
+          setIsSent(false);
           Swal.fire({
             title: "Error!",
             text: `${response.message}`,
@@ -38,7 +38,18 @@ const ForgetPassword = () => {
         }
       };
 
-      dispatch(sendEmailForgotPassword({ email, handleSuccess }));
+      const handleError = () => {
+        setIsSent(false);
+        Swal.fire({
+          title: "Error!",
+          text: "Internal Server Error",
+          timer: 2500,
+          icon: "error",
+          showConfirmButton: false,
+        });
+      };
+
+      dispatch(sendEmailForgotPassword({ email, handleSuccess, handleError }));
     } catch (error) {
       throw error;
     }
@@ -62,7 +73,7 @@ const ForgetPassword = () => {
             />
           </div>
           <div className="my-6">
-            <Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isLogged ? "Send Verification" : <Spinner />} />
+            <Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isSent ? "Send Verification" : <Spinner />} />
           </div>
         </form>
         <div>

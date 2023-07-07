@@ -61,7 +61,7 @@ export const compareVerificationCode = createAsyncThunk(
   }
 );
 
-export const sendEmailForgotPassword = createAsyncThunk('sendEmailForgotPassword', ({ email, handleSuccess }) => {
+export const sendEmailForgotPassword = createAsyncThunk('sendEmailForgotPassword', ({ email, handleSuccess, handleError }) => {
   return new Promise((resolve, reject) => {
     axios
       .post(`${backendUrl}/send-email/${email}`)
@@ -70,14 +70,8 @@ export const sendEmailForgotPassword = createAsyncThunk('sendEmailForgotPassword
         handleSuccess(response.data);
       })
       .catch((error) => {
-        Swal.fire({
-          title: "Error!",
-          text: "Internal Server Error",
-          timer: 2500,
-          icon: "error",
-          showConfirmButton: false,
-        });
         reject(error);
+        handleError();
       });
   });
 });
