@@ -27,6 +27,7 @@ const ForgetPassword = () => {
             icon: "success",
             timer: 3000,
           });
+          return navigate('/verificationpage');
         } else {
           setIsSent(false);
           Swal.fire({

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { backendUrl } from "../../config/env.config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import Swal from "sweetalert2";
 
 export const loginUser = createAsyncThunk('loginUser', ({ form, handleSuccess, handleError }) => {
   return new Promise((resolve, reject) => {
