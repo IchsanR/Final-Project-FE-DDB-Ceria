@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef, Fragment } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData, selectData } from "../../redux/slice/dataSlice";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
+import { Chart } from "primereact/chart";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
@@ -11,7 +12,9 @@ import "primeicons/primeicons.css"; // icons
 const Home = () => {
   const dispatch = useDispatch();
   const { data } = useSelector(selectData);
+  const { totalPages } = useSelector((state) => state.data);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const name = localStorage.getItem("name") || sessionStorage.getItem("name");
 
   useEffect(() => {
     dispatch(fetchData(1));
@@ -72,46 +75,44 @@ const Home = () => {
 
   const homeData = isDataLoaded && data ? data.slice(0, 10) : [];
 
+  const options = {
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
+
   return (
     <Fragment>
-      <>
-        {/* <Navs /> */}
-        <div className="card">
-          {isDataLoaded && (
-            <DataTable value={homeData} tableStyle={{ minWidth: "50rem" }}>
-              <Column field="id" header="Id" />
-              <Column
-                field="oda_number"
-                dataType="numeric"
-                style={{ width: "25%" }}
-                header="Oda Number"
-              />
-              <Column
-                field="bill_amount"
-                body={balanceBodyTemplate}
-                dataType="numeric"
-                style={{ minWidth: "5rem" }}
-                header="Price"
-              />
-              <Column
-                header="Date"
-                field="created_at"
-                dataType="date"
-                style={{ minWidth: "5rem" }}
-                body={dateBodyTemplate}
-              />
-              <Column
-                field="status"
-                body={statusBodyTemplate}
-                style={{ width: "20%" }}
-                header="Status"
-              />
-            </DataTable>
-          )}
+      <div className="card">
+        <div className="dashboard-box bg-blue-200 p-4 rounded-lg mb-2">
+          <h2 className="text-lg font-semibold mb-2">Selamat datang, {name}</h2>
         </div>
-      </>
+        <div className="dashboard-box bg-green-200 p-4 rounded-lg mb-2">
+          <h2 className="text-lg font-semibold mb-2">Total Data</h2>
+          <h3 className="text-3xl font-bold">{totalPages}</h3>
+        </div>
+      </div>
+      <div className="card">
+        {isDataLoaded && (
+          <div className="flex flex-wrap">
+            <div className="w-full">
+              <h2 className="text-lg font-semibold mb-2">Last 10 Transactions</h2>
+              <DataTable className="w-full mt-4 p-datatable-sm" value={homeData}>
+                <Column field="id" header="Id" />
+                <Column field="oda_number" dataType="numeric" header="Oda Number" />
+                <Column field="bill_amount" body={balanceBodyTemplate} dataType="numeric" header="Price" />
+                <Column field="created_at" dataType="date" header="Date" body={dateBodyTemplate} />
+                <Column field="status" body={statusBodyTemplate} header="Status" />
+              </DataTable>
+            </div>
+          </div>
+        )}
+      </div>
     </Fragment>
   );
 };
 
 export default Home;
+  
