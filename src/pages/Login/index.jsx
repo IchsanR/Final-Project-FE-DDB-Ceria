@@ -71,15 +71,15 @@ const Login = () => {
 
 			dispatch(loginUser({ form, handleSuccess }));
 		} catch (error) {
-			if (error) {
-				return Swal.fire({
-					title: "Error!",
-					text: "Internal Server Error",
-					timer: 2500,
-					icon: "error",
-					showConfirmButton: false,
-				});
-			}
+			Swal.fire({
+				title: "Error!",
+				text: "Internal Server Error",
+				timer: 2500,
+				icon: "error",
+				showConfirmButton: false,
+			});
+
+			throw error;
 		}
 
 	};

@@ -59,3 +59,16 @@ export const compareVerificationCode = createAsyncThunk(
   }
 );
 
+export const sendEmailForgotPassword = createAsyncThunk('sendEmailForgotPassword', ({ email, handleSuccess }) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${backendUrl}/send-email/${email}`)
+      .then((response) => {
+        resolve(response);
+        handleSuccess(response.data);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+});
