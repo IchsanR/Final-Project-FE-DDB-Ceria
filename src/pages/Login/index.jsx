@@ -54,31 +54,31 @@ const Login = () => {
 							localStorage.setItem("email", response.data.data[0].email);
 							return navigate("/");
 						}
+					} else {
+						Swal.fire({
+							title: "Error!",
+							text: `${response.data.message}`,
+							timer: 2500,
+							icon: "error",
+							showConfirmButton: false,
+						});
 					}
-				}
-
-				if (response.error) {
-					setIsLogged(false);
-					return Swal.fire({
-						title: "Error!",
-						text: response.error.data.message,
-						timer: 2500,
-						icon: "error",
-						showConfirmButton: false,
-					});
 				}
 			};
 
-			dispatch(loginUser({ form, handleSuccess }));
-		} catch (error) {
-			Swal.fire({
-				title: "Error!",
-				text: "Internal Server Error",
-				timer: 2500,
-				icon: "error",
-				showConfirmButton: false,
-			});
+			const handleError = () => {
+				setIsLogged(false);
+				Swal.fire({
+					title: "Error!",
+					text: "Internal Server Error",
+					timer: 2500,
+					icon: "error",
+					showConfirmButton: false,
+				});
+			};
 
+			dispatch(loginUser({ form, handleSuccess, handleError }));
+		} catch (error) {
 			throw error;
 		}
 

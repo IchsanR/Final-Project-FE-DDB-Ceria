@@ -1,8 +1,9 @@
 import axios from "axios";
 import { backendUrl } from "../../config/env.config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import Swal from "sweetalert2";
 
-export const loginUser = createAsyncThunk('loginUser', ({ form, handleSuccess }) => {
+export const loginUser = createAsyncThunk('loginUser', ({ form, handleSuccess, handleError }) => {
   return new Promise((resolve, reject) => {
     axios
       .post(`${backendUrl}/login`, form)
@@ -11,6 +12,7 @@ export const loginUser = createAsyncThunk('loginUser', ({ form, handleSuccess })
         resolve(response);
       })
       .catch((error) => {
+        handleError();
         reject(error);
       });
   });
@@ -68,6 +70,13 @@ export const sendEmailForgotPassword = createAsyncThunk('sendEmailForgotPassword
         handleSuccess(response.data);
       })
       .catch((error) => {
+        Swal.fire({
+          title: "Error!",
+          text: "Internal Server Error",
+          timer: 2500,
+          icon: "error",
+          showConfirmButton: false,
+        });
         reject(error);
       });
   });
