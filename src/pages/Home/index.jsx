@@ -14,7 +14,6 @@ const Home = () => {
   const { totalPages } = useSelector((state) => state.data);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
-
   useEffect(() => {
     dispatch(fetchData(1));
   }, [dispatch]);
@@ -72,24 +71,18 @@ const Home = () => {
     return "";
   };
 
-  const homeData = isDataLoaded && data ? data.slice(0, 10) : [];
-
-  const options = {
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
+  const sortedData = isDataLoaded && data ? [...data].sort((a, b) => b.id - a.id) : [];
+  const homeData = sortedData.slice(0, 10);
+  
 
   return (
     <Fragment>
       <div className="card">
-        <div className="dashboard-box bg-blue-200 p-4 rounded-lg mb-2">
+        <div className="dashboard-box bg-violet-600 text-white p-4 rounded-lg mb-2">
           <h2 className="text-lg font-semibold mb-2">Selamat datang, {name}</h2>
         </div>
-        <div className="dashboard-box bg-green-200 p-4 rounded-lg mb-2">
-          <h2 className="text-lg font-semibold mb-2">Total Data</h2>
+        <div className="dashboard-box bg-violet-800 text-white p-4 rounded-lg mb-2">
+          <h2 className="text-lg font-semibold mb-2">Total Transaksi</h2>
           <h3 className="text-3xl font-bold">{totalPages}</h3>
         </div>
       </div>
@@ -99,7 +92,7 @@ const Home = () => {
             <div className="w-full">
               <h2 className="text-lg font-semibold mb-2">Last 10 Transactions</h2>
               <DataTable className="w-full mt-4 p-datatable-sm" value={homeData}>
-                <Column field="id" header="Id" />
+                <Column field="id" header="Id"  />
                 <Column field="oda_number" dataType="numeric" header="Oda Number" />
                 <Column field="bill_amount" body={balanceBodyTemplate} dataType="numeric" header="Price" />
                 <Column field="created_at" dataType="date" header="Date" body={dateBodyTemplate} />

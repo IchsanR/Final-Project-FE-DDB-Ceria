@@ -309,7 +309,7 @@ const TransactionPage = () => {
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
           scrollable
-          scrollHeight="430px"
+          scrollHeight="480px"
           paginatorRight={paginatorRight}
           paginatorLeft={paginatorLeft}
           emptyMessage={"No data found, please click show all to found your data"}
@@ -328,7 +328,7 @@ const TransactionPage = () => {
             showAddButton={false}
           ></Column>
           <Column
-            field="bill_amount"
+            field="price"
             body={balanceBodyTemplate}
             filter
             sortable
