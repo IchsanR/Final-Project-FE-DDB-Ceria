@@ -2,43 +2,58 @@ import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
+import { sendEmailForgotPassword } from "../../redux/api/user";
 
 
 const ForgetPassword = () => {
-  const [form, setForm] = useState({
-    email: "",
-  });
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
-  const [isLogged, setIsLogged] = useState(false);
+  const dispatch = useDispatch();
+  const [isSent, setIsSent] = useState(false);
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    setIsLogged(true);
+    try {
+      e.preventDefault();
+      setIsSent(true);
 
-    const handleSuccess = (response) => {
-      if (response.data) {
-        if (response.data.code === 200) {
-          setIsLogged(false);
+      const handleSuccess = (response) => {
+        console.log(response);
+        if (response.code === 200) {
+          setIsSent(false);
           Swal.fire({
-            title: "Success!",
-            text: `Selamat datang ${response.data.data[0].name}`,
+            title: "Verification code sent!",
+            text: `Please check your email`,
             icon: "success",
             timer: 3000,
           });
+          return navigate('/verificationpage');
+        } else {
+          setIsSent(false);
+          Swal.fire({
+            title: "Error!",
+            text: `${response.message}`,
+            icon: "error",
+            timer: 3000,
+          });
         }
-      }
+      };
 
-      if (response.error) {
-        setIsLogged(false);
-        return Swal.fire({
+      const handleError = () => {
+        setIsSent(false);
+        Swal.fire({
           title: "Error!",
-          text: response.error.data.message,
+          text: "Internal Server Error",
           timer: 2500,
           icon: "error",
           showConfirmButton: false,
         });
-      }
-    };
+      };
+
+      dispatch(sendEmailForgotPassword({ email, handleSuccess, handleError }));
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
@@ -55,11 +70,11 @@ const ForgetPassword = () => {
             <p>Please fill your email so we can send the verification code to you.</p>
           </div>
           <div className="mb-3">
-            <Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setForm({ ...form, email: e.target.value })}
+            <Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="my-6">
-            <Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isLogged ? "Send Verification" : <Spinner />} />
+            <Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isSent ? "Send Verification" : <Spinner />} />
           </div>
         </form>
         <div>
