@@ -1,16 +1,12 @@
 import { combineReducers } from "redux";
-import {userApi} from "../api/user"
-import loginReducer from "./login";
-import registerReducer from "./register";
-import sendVerificationReducer from "./sendVerification";
-import compareVerificationReducer from "./compareVerification";
+import { userApi } from "../api/User";
+// import { apiModal } from "../api/exportCsvApi";
+// import exportsCsv from "./export";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
-  login: loginReducer,
-  register: registerReducer,
-  sendVerification: sendVerificationReducer,
-  compareVerification: compareVerificationReducer
+  // [apiModal.reducerPath]: apiModal.reducer,
+  // apiModal : exportsCsv
 });
 
 export default rootReducer;

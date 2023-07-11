@@ -4,7 +4,5 @@ import Logo from "./atom/Logo";
 import ExportCsv from "./molecule/ExportCsv";
 import Navs from "./molecule/Navbar";
 import Spinner from "./atom/Spinner";
-import Passwordshowhide from "./atom/Passwordshowhide";
-import Modal from "./molecule/TnC";
 
-export { Buttons, Logo, Inputs, Navs, Spinner, Passwordshowhide, Modal, ExportCsv };
+export { Buttons, Logo, Inputs, ExportCsv, Navs, Spinner };

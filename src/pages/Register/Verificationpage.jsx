@@ -1,22 +1,22 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import Swal from "sweetalert2";
-import { Logo, Buttons, Spinner } from "../../components";
 import {
-  compareVerificationCode,
-  registerUser,
-  sendEmailVerification,
-} from "../../redux/api/user";
+  useCompareVerificationCodeMutation,
+  useRegisterUserMutation,
+  useSendEmailVerificationMutation,
+} from "../../redux/api/User";
+import Swal from "sweetalert2";
+import { Logo, Buttons } from "../../components";
 
-const VerificationPage = () => {
+const Verificationpage = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
-  const [resendTimer, setResendTimer] = useState(15);
-  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(30); // Timer mundur 5 detik
   const location = useLocation();
   const navigate = useNavigate();
   const email = localStorage.getItem("verificationEmail");
-  const dispatch = useDispatch();
+  const [compareVerificationCode] = useCompareVerificationCodeMutation();
+  const [registerUser] = useRegisterUserMutation();
+  const [sendEmailVerification] = useSendEmailVerificationMutation();
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
 
@@ -46,24 +46,13 @@ const VerificationPage = () => {
 
   const handleKeyDown = useCallback(
     (index, event) => {
-      if (
-        event.key === "Backspace" &&
-        index > 0 &&
-        verificationCode[index] === ""
-      ) {
+      if (event.key === "Backspace" && index > 0 && verificationCode[index] === "") {
         inputRefs.current[index - 1].focus();
-      } else if (
-        event.key === "Delete" &&
-        index < verificationCode.length - 1 &&
-        verificationCode[index] === ""
-      ) {
+      } else if (event.key === "Delete" && index < verificationCode.length - 1 && verificationCode[index] === "") {
         inputRefs.current[index + 1].focus();
       } else if (event.key === "ArrowLeft" && index > 0) {
         inputRefs.current[index - 1].focus();
-      } else if (
-        event.key === "ArrowRight" &&
-        index < verificationCode.length - 1
-      ) {
+      } else if (event.key === "ArrowRight" && index < verificationCode.length - 1) {
         inputRefs.current[index + 1].focus();
       }
     },
@@ -87,28 +76,26 @@ const VerificationPage = () => {
 
   const handleResend = async () => {
     try {
-      Swal.fire({
-        title: "Mohon ditunggu",
-        text: "Sedang mengirim ulang email verifikasi...",
-        icon: "info",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        onBeforeOpen: () => {
-          Swal.showLoading();
-        },
-        didOpen: () => {
-          Swal.showLoading();
-        },
-        willClose: () => {
-          Swal.hideLoading();
-        },
-      });
+        Swal.fire({
+            title: "Mohon ditunggu",
+            text: "Sedang mengirim ulang email verifikasi...",
+            icon: "info",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            onBeforeOpen: () => {
+              Swal.showLoading();
+            },
+            didOpen: () => {
+              Swal.showLoading(); 
+            },
+            willClose: () => {
+              Swal.hideLoading(); 
+            },
+          });
 
-      setLoading(true);
+      await sendEmailVerification(email);
 
-      await dispatch(sendEmailVerification({ email }));
-
-      setResendTimer(15);
+      setResendTimer(30);
 
       Swal.fire({
         title: "Tautan Verifikasi Terkirim",
@@ -116,11 +103,7 @@ const VerificationPage = () => {
         icon: "success",
         timer: 5000,
       });
-
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
-
       Swal.fire({
         title: "Error!",
         text: "Terjadi kesalahan saat mengirim ulang tautan verifikasi",
@@ -135,47 +118,43 @@ const VerificationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const code = verificationCode.join("");
-    
-    // menambahkan log untuk mengecek kode OTP yang diinput
-    console.log('OTP Input: ', code);
-    
+
     try {
-      setLoading(true);
-  
-      const response = await dispatch(compareVerificationCode({ email, code }));
-  
-      // menambahkan log untuk mengecek respons yang didapat dari server
-      console.log('Server Response: ', response);
-  
-      if (response.payload.message === "Success Verification Code")  {
-        // kode OTP valid
-        const name = localStorage.getItem("name");
-        const email = localStorage.getItem("email");
-        const phone = localStorage.getItem("phone");
-        const password = localStorage.getItem("password");
-        const role = localStorage.getItem("role");
-  
-        await dispatch(
-          registerUser({ form: { name, email, phone, password, role } })
-        );
-  
-        // setelah sukses register, hapus semua data dari localStorage
-        localStorage.removeItem("name");
-        localStorage.removeItem("email");
-        localStorage.removeItem("phone");
-        localStorage.removeItem("password");
-        localStorage.removeItem("verificationEmail");
-  
+      const response = await compareVerificationCode({
+        email,
+        code,
+      }).unwrap();
+
+      if (response.code === 200) {
         Swal.fire({
           title: "Verifikasi Berhasil",
           text: "Akun Anda telah berhasil diverifikasi!",
           icon: "success",
           timer: 5000,
         });
-  
+
+        const name = localStorage.getItem("name");
+        const email = localStorage.getItem("email");
+        const phone = localStorage.getItem("phone");
+        const password = localStorage.getItem("password");
+        const role = localStorage.getItem("role");
+
+        await registerUser({
+          name,
+          email,
+          phone,
+          password,
+          role,
+        });
+
+        localStorage.removeItem("name");
+        localStorage.removeItem("email");
+        localStorage.removeItem("phone");
+        localStorage.removeItem("password");
+        localStorage.removeItem("verificationEmail");
+
         navigate("/login");
       } else {
-        // kode OTP tidak valid
         Swal.fire({
           title: "Error!",
           text: "Kode verifikasi tidak cocok",
@@ -184,14 +163,7 @@ const VerificationPage = () => {
           showConfirmButton: false,
         });
       }
-  
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
-  
-      // menambahkan log untuk mengecek error yang terjadi
-      console.error('Error: ', error);
-  
       Swal.fire({
         title: "Error!",
         text: "Terjadi kesalahan saat verifikasi",
@@ -199,11 +171,10 @@ const VerificationPage = () => {
         icon: "error",
         showConfirmButton: false,
       });
-  
+
       throw error;
     }
   };
-  
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
@@ -217,8 +188,9 @@ const VerificationPage = () => {
           </div>
           <div className="mb-6">
             <p className="text-gray-700">
-              Kode verifikasi telah dikirim ke <strong>{email}</strong>.
-              Silakan masukkan kode verifikasi untuk melanjutkan.
+              Kode verifikasi telah dikirim ke <strong
+              >{email}</strong>. Silakan masukkan kode
+              verifikasi untuk melanjutkan.
             </p>
           </div>
           <div className="flex items-center justify-center mb-6">
@@ -257,21 +229,11 @@ const VerificationPage = () => {
           </div>
           <div className="my-6">
             <Buttons
-              type="submit"
-              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              description={
-                loading ? (
-                  <div className="flex items-center justify-center">
-                    <Spinner />
-                    <span className="ml-2">Please Wait...</span>
-                  </div>
-                ) : (
-                  "Verifikasi"
-                )
+              type={"submit"}
+              classname={
+                "w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"
               }
-              disabled={loading}
+              description={"Verifikasi"}
             />
           </div>
         </form>
@@ -280,4 +242,4 @@ const VerificationPage = () => {
   );
 };
 
-export default VerificationPage;
+export default Verificationpage;

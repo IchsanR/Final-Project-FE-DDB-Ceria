@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 import storage from "redux-persist/lib/storage";
+import { userApi } from "./api/User";
 import rootReducer from "./reducer/reducer";
 import { persistReducer } from "redux-persist";
 import dataReducer from './slice/dataSlice'
@@ -20,7 +21,6 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(thunk, userApi.middleware),
-    
 });
 
 export default store

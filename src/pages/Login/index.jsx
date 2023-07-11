@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser, useLoginUserMutation } from "../../redux/api/user";
+import { useLoginUserMutation } from "../../redux/api/User";
 import Swal from "sweetalert2";
-import { useDispatch } from "react-redux";
 
 
 const Login = () => {
@@ -13,7 +12,7 @@ const Login = () => {
 	});
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
+	const [loginUser] = useLoginUserMutation();
 	const [isLogged, setIsLogged] = useState(false);
 
 	const handleChecked = (e) => {
@@ -68,7 +67,10 @@ const Login = () => {
 			}
 		};
 
-		dispatch(loginUser({ form, handleSuccess }));
+		loginUser(form)
+			.then((response) => {
+				handleSuccess(response);
+			});
 	};
 
 	return (
@@ -90,12 +92,12 @@ const Login = () => {
 						/>
 					</div>
 					<div className="flex justify-between my-3">
-						<div className="flex">
-							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 my-auto" onChange={(e) => handleChecked(e)} />
-							<label htmlFor="rememberMe" className="text-[#6B7280] my-auto">Remember Me</label>
+						<div>
+							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2" onChange={(e) => handleChecked(e)} />
+							<label htmlFor="rememberMe" className="text-[#6B7280]">Remember Me</label>
 						</div>
 						<div>
-							<Link to={"/forgot-password"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
+							<Link to={"/"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
 						</div>
 					</div>
 					<div className="my-6">
