@@ -29,59 +29,46 @@ const Login = () => {
 
 
 	const onSubmit = (e) => {
-		try {
-			e.preventDefault();
-			setIsLogged(true);
+		e.preventDefault();
+		setIsLogged(true);
 
-			const handleSuccess = (response) => {
-				if (response.data) {
-					if (response.data.code === 200) {
-						setIsLogged(false);
-						Swal.fire({
-							title: "Success!",
-							text: `Selamat datang ${response.data.data[0].name}`,
-							icon: "success",
-							timer: 3000,
-						});
-						if (checked === false) {
-							sessionStorage.setItem("token", response.data.data[0].token);
-							sessionStorage.setItem("name", response.data.data[0].name);
-							sessionStorage.setItem("email", response.data.data[0].email);
-							return navigate("/");
-						} else {
-							localStorage.setItem("name", response.data.data[0].name);
-							localStorage.setItem("token", response.data.data[0].token);
-							localStorage.setItem("email", response.data.data[0].email);
-							return navigate("/");
-						}
+		const handleSuccess = (response) => {
+			if (response.data) {
+				if (response.data.code === 200) {
+					setIsLogged(false);
+					Swal.fire({
+						title: "Success!",
+						text: `Selamat datang ${response.data.data[0].name}`,
+						icon: "success",
+						timer: 3000,
+					});
+					if (checked === false) {
+						sessionStorage.setItem("token", response.data.data[0].token);
+						sessionStorage.setItem("name", response.data.data[0].name);
+						sessionStorage.setItem("email", response.data.data[0].email);
+						return navigate("/");
 					} else {
-						Swal.fire({
-							title: "Error!",
-							text: `${response.data.message}`,
-							timer: 2500,
-							icon: "error",
-							showConfirmButton: false,
-						});
+						localStorage.setItem("name", response.data.data[0].name);
+						localStorage.setItem("token", response.data.data[0].token);
+						localStorage.setItem("email", response.data.data[0].email);
+						return navigate("/");
 					}
 				}
-			};
+			}
 
-			const handleError = () => {
+			if (response.error) {
 				setIsLogged(false);
-				Swal.fire({
+				return Swal.fire({
 					title: "Error!",
-					text: "Internal Server Error",
+					text: response.error.data.message,
 					timer: 2500,
 					icon: "error",
 					showConfirmButton: false,
 				});
-			};
+			}
+		};
 
-			dispatch(loginUser({ form, handleSuccess, handleError }));
-		} catch (error) {
-			throw error;
-		}
-
+		dispatch(loginUser({ form, handleSuccess }));
 	};
 
 	return (
