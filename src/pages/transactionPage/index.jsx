@@ -36,6 +36,34 @@ const TransactionPage = () => {
    // }, 200);
   }, [dispatch]);
 
+  useEffect(() => {
+    // Show toast for error
+    if (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while fetching data.",
+        life: 3000,
+      });
+    }
+  }, [error]);
+
+  useEffect(() => {
+    // Show toast for pending data
+    const pendingDataTimeout = setTimeout(() => {
+      if (loading) {
+        toast.current.show({
+          severity: "info",
+          summary: "Pending",
+          detail: "Data is still loading...",
+          life: 3000,
+        });
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearTimeout(pendingDataTimeout);
+  }, [loading]);
+
   const onPageChange = (event) => {
     dispatch(fetchData(event.page + 1));
     setFirst(event.first);
