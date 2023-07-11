@@ -44,7 +44,6 @@ const ExportCsv = () => {
           setLoading(true);
         }
       });
-    // }
   };
 
   useEffect(() => {
