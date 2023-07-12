@@ -86,6 +86,7 @@ const CreatePassword = () => {
         showConfirmButton: true,
         confirmButtonText: "OK!",
       });
+      setLoading(false);
       return;
     }
 
@@ -97,6 +98,7 @@ const CreatePassword = () => {
         showConfirmButton: true,
         confirmButtonText: "OK!",
       });
+      setLoading(false);
       return;
     }
 
@@ -108,6 +110,7 @@ const CreatePassword = () => {
         showConfirmButton: true,
         confirmButtonText: "OK!",
       });
+      setLoading(false);
       return;
     }
 
