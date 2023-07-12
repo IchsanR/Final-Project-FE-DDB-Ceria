@@ -4,7 +4,8 @@ import { registerUser } from "../api/user";
 const initialState = {
   data: [],
   isLoading: true,
-  isError: false
+  isError: false,
+  isFulfilled: false
 };
 
 const registerReducer = createReducer(initialState, (builder) => {
@@ -14,7 +15,8 @@ const registerReducer = createReducer(initialState, (builder) => {
       ...state,
       data: [],
       isLoading: true,
-      isError: false
+      isError: false,
+      isFulfilled: false
     };
   });
 
@@ -22,9 +24,10 @@ const registerReducer = createReducer(initialState, (builder) => {
   builder.addCase(registerUser.fulfilled, (state, action) => {
     return {
       ...state,
-      data: action.payload,
+      data: action.payload.data,
       isLoading: false,
-      isError: false
+      isError: false,
+      isFulfilled: true
     };
   });
 
@@ -32,9 +35,10 @@ const registerReducer = createReducer(initialState, (builder) => {
   builder.addCase(registerUser.rejected, (state, action) => {
     return {
       ...state,
-      data: action.payload,
+      data: action,
       isLoading: false,
-      isError: true
+      isError: true,
+      isFulfilled: false
     };
   });
 });

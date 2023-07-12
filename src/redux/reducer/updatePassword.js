@@ -1,17 +1,17 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { loginUser } from "../api/user";
+import { updatePassword } from "../api/user";
 import { revertAll } from "../api/resetState";
 
 const initialState = {
   data: [],
-  isLoading: true,
+  isLoading: false,
   isError: false,
   isFulfilled: false
 };
 
-const loginReducer = createReducer(initialState, (builder) => {
+const updatePasswordReducer = createReducer(initialState, (builder) => {
   // pending
-  builder.addCase(loginUser.pending, (state) => {
+  builder.addCase(updatePassword.pending, (state) => {
     return {
       ...state,
       data: [],
@@ -22,7 +22,7 @@ const loginReducer = createReducer(initialState, (builder) => {
   });
 
   // fulfilled
-  builder.addCase(loginUser.fulfilled, (state, action) => {
+  builder.addCase(updatePassword.fulfilled, (state, action) => {
     return {
       ...state,
       data: action.payload.data,
@@ -33,18 +33,17 @@ const loginReducer = createReducer(initialState, (builder) => {
   });
 
   // rejected
-  builder.addCase(loginUser.rejected, (state, action) => {
+  builder.addCase(updatePassword.rejected, (state, action) => {
     return {
       ...state,
-      data: action.error,
+      data: action,
       isLoading: false,
       isError: true,
       isFulfilled: false
     };
   });
 
-  // Logout
   builder.addCase(revertAll, () => initialState);
 });
 
-export default loginReducer;
+export default updatePasswordReducer;

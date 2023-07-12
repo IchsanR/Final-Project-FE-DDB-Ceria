@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { sendEmailForgotPassword } from "../../redux/api/user";
 
 
@@ -12,45 +12,65 @@ const ForgetPassword = () => {
   const dispatch = useDispatch();
   const [isSent, setIsSent] = useState(false);
 
+  const response = useSelector((state) => {
+    return state.sendEmailForget;
+  });
+
+  useEffect(() => {
+    if (response.isFulfilled && response.data.code === 200) {
+      setIsSent(false);
+      Swal.fire({
+        title: "Verification code sent!",
+        text: `Please check your email`,
+        icon: "success",
+        timer: 3000,
+      });
+      localStorage.setItem('email', email);
+      return navigate('/verification');
+    }
+
+    if (response.isError && response.data.code === "ERR_NETWORK") {
+      setIsSent(false);
+      Swal.fire({
+        title: "Error!",
+        text: "Internal Server Error",
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+    if (response.isFulfilled && response.data.code === 400) {
+      setIsSent(false);
+      Swal.fire({
+        title: "Error!",
+        text: `${response.data.message}`,
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+
+  }, [response]);
+
   const onSubmit = (e) => {
     try {
       e.preventDefault();
       setIsSent(true);
 
-      const handleSuccess = (response) => {
-        console.log(response);
-        if (response.code === 200) {
-          setIsSent(false);
-          Swal.fire({
-            title: "Verification code sent!",
-            text: `Please check your email`,
-            icon: "success",
-            timer: 3000,
-          });
-          return navigate('/verificationpage');
-        } else {
-          setIsSent(false);
-          Swal.fire({
-            title: "Error!",
-            text: `${response.message}`,
-            icon: "error",
-            timer: 3000,
-          });
-        }
-      };
-
-      const handleError = () => {
-        setIsSent(false);
+      if (email === "") {
         Swal.fire({
           title: "Error!",
-          text: "Internal Server Error",
-          timer: 2500,
+          text: "Form cannot blank",
           icon: "error",
-          showConfirmButton: false,
+          timer: 3000,
         });
-      };
+        setIsSent(false);
+        return;
+      }
 
-      dispatch(sendEmailForgotPassword({ email, handleSuccess, handleError }));
+      dispatch(sendEmailForgotPassword({ email }));
     } catch (error) {
       throw error;
     }

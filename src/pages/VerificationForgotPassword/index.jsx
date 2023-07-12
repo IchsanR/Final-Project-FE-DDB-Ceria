@@ -1,21 +1,17 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import Swal from "sweetalert2";
-import { VerificationLayout } from "../../components";
-import {
-  compareVerificationCode,
-  registerUser,
-  sendEmailVerification,
-} from "../../redux/api/user";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { VerificationLayout } from '../../components';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { compareVerificationCode, sendEmailForgotPassword } from '../../redux/api/user';
+import Swal from 'sweetalert2';
+import { revertAll } from '../../redux/api/resetState';
 
-const VerificationPage = () => {
+const ForgetVerification = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
   const [resendTimer, setResendTimer] = useState(15);
   const [loading, setLoading] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
-  const email = localStorage.getItem("verificationEmail");
+  const email = localStorage.getItem("email");
   const dispatch = useDispatch();
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
@@ -85,11 +81,51 @@ const VerificationPage = () => {
     setVerificationCode(newVerificationCode);
   };
 
-  const handleResend = async () => {
+  const resendResponse = useSelector((state) => {
+    return state.sendEmailForget;
+  });
+
+  useEffect(() => {
+    if (resendResponse.isFulfilled && resendResponse.data.code === 200) {
+      setLoading(false);
+      Swal.fire({
+        title: "Verification code sent",
+        text: "Please check your email",
+        icon: "success",
+        timer: 5000,
+      });
+      return;
+    }
+
+    if (resendResponse.isFulfilled && resendResponse.data.code !== 200) {
+      setLoading(false);
+      Swal.fire({
+        title: "Error!",
+        text: `There's a mistake when resend the verification code!`,
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+    if (resendResponse.isError && resendResponse.data.code === "ERR_NETWORK") {
+      setLoading(false);
+      Swal.fire({
+        title: "Error!",
+        text: "Internal Server Error",
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+  }, [resendResponse]);
+
+  const handleResend = () => {
     try {
       Swal.fire({
-        title: "Mohon ditunggu",
-        text: "Sedang mengirim ulang email verifikasi...",
+        title: "Please Wait!",
+        text: "Sending verification code...",
         icon: "info",
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -106,91 +142,83 @@ const VerificationPage = () => {
 
       setLoading(true);
 
-      await dispatch(sendEmailVerification({ email }));
+      dispatch(sendEmailForgotPassword({ email }));
 
       setResendTimer(15);
-
-      Swal.fire({
-        title: "Tautan Verifikasi Terkirim",
-        text: "Tautan verifikasi telah dikirim ulang ke email Anda.",
-        icon: "success",
-        timer: 5000,
-      });
-
-      setLoading(false);
     } catch (error) {
       setLoading(false);
-
-      Swal.fire({
-        title: "Error!",
-        text: "Terjadi kesalahan saat mengirim ulang tautan verifikasi",
-        timer: 2500,
-        icon: "error",
-        showConfirmButton: false,
-      });
       throw error;
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const code = verificationCode.join("");
+  const codeVerifResponse = useSelector((state) => {
+    return state.compareVerification;
+  });
 
-    // menambahkan log untuk mengecek kode OTP yang diinput
-    console.log('OTP Input: ', code);
+  const code = verificationCode.join("");
+
+  useEffect(() => {
+    if (codeVerifResponse.isFulfilled && codeVerifResponse.data.code === 200) {
+      localStorage.removeItem("email");
+
+      Swal.fire({
+        title: "Success",
+        text: "Account verified",
+        icon: "success",
+        timer: 5000,
+      });
+
+      localStorage.setItem('code', code);
+      localStorage.setItem('id', codeVerifResponse.data.data[0].id);
+      setLoading(false);
+      dispatch(revertAll());
+      return navigate("/setpassword");
+    }
+
+    if (codeVerifResponse.isFulfilled && codeVerifResponse.data.code === 400) {
+      setLoading(false);
+      Swal.fire({
+        title: "Error!",
+        text: `Verification code doesn't match`,
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+    if (codeVerifResponse.isError && codeVerifResponse.data.code === "ERR_NETWORK") {
+      setLoading(false);
+      Swal.fire({
+        title: "Error!",
+        text: "Internal Server Error",
+        icon: "error",
+        timer: 3000,
+      });
+      return;
+    }
+
+  }, [codeVerifResponse]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     try {
       setLoading(true);
 
-      const response = await dispatch(compareVerificationCode({ email, code }));
-
-      // menambahkan log untuk mengecek respons yang didapat dari server
-      console.log('Server Response: ', response);
-
-      if (response.payload.message === "Success Verification Code") {
-        // kode OTP valid
-        const name = localStorage.getItem("name");
-        const email = localStorage.getItem("email");
-        const phone = localStorage.getItem("phone");
-        const password = localStorage.getItem("password");
-        const role = localStorage.getItem("role");
-
-        await dispatch(
-          registerUser({ form: { name, email, phone, password, role } })
-        );
-
-        // setelah sukses register, hapus semua data dari localStorage
-        localStorage.removeItem("name");
-        localStorage.removeItem("email");
-        localStorage.removeItem("phone");
-        localStorage.removeItem("password");
-        localStorage.removeItem("verificationEmail");
-
-        Swal.fire({
-          title: "Verifikasi Berhasil",
-          text: "Akun Anda telah berhasil diverifikasi!",
-          icon: "success",
-          timer: 5000,
-        });
-
-        navigate("/login");
-      } else {
-        // kode OTP tidak valid
+      if (!code) {
         Swal.fire({
           title: "Error!",
-          text: "Kode verifikasi tidak cocok",
-          timer: 2500,
+          text: "Please input verification code",
           icon: "error",
-          showConfirmButton: false,
+          timer: 3000,
         });
+        setLoading(false);
+        return;
       }
+      dispatch(compareVerificationCode({ email, code }));
 
-      setLoading(false);
     } catch (error) {
       setLoading(false);
-
-      // menambahkan log untuk mengecek error yang terjadi
-      console.error('Error: ', error);
 
       Swal.fire({
         title: "Error!",
@@ -203,13 +231,11 @@ const VerificationPage = () => {
       throw error;
     }
   };
-
-
   return (
-    <>
+    <Fragment>
       <VerificationLayout handleSubmit={handleSubmit} email={email} verificationCode={verificationCode} handleInputChange={handleInputChange} handleKeyDown={handleKeyDown} handlePaste={handlePaste} inputRefs={inputRefs} focusedInput={focusedInput} handleResend={handleResend} resendTimer={resendTimer} loading={loading} />
-    </>
+    </Fragment>
   );
 };
 
-export default VerificationPage;
+export default ForgetVerification;
