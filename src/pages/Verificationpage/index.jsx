@@ -157,7 +157,7 @@ const VerificationPage = () => {
         setLoading(true);
 
         const response = await dispatch(sendEmailVerification({ email: newEmail }));
-        console.log(response.payload.data.code)
+
         if (response.payload.data.code === 400) {
           Swal.fire({
             title: "Error!",
