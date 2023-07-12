@@ -280,4 +280,4 @@ const VerificationPage = () => {
   );
 };
 
-export default VerificationPage;
+export default VerificationPage;  

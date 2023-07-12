@@ -13,6 +13,7 @@ const Register = () => {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
     role: "admin",
   });
   const [checked, setChecked] = useState(false);
@@ -21,6 +22,7 @@ const Register = () => {
     feedback: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordMismatch, setPasswordMismatch] = useState(false); // New state for password mismatch
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -41,11 +43,25 @@ const Register = () => {
     });
 
     setForm({ ...form, password: password });
+
+    // Reset password mismatch error when password is updated
+    setPasswordMismatch(false);
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const confirmPassword = e.target.value;
+    setForm({ ...form, confirmPassword: confirmPassword });
+
+    // Check if password and confirm password match
+    setPasswordMismatch(form.password !== confirmPassword);
   };
 
   const handlePasswordClear = () => {
     setPasswordStrength({ score: 0, feedback: "" });
     setForm({ ...form, password: "" });
+
+    // Reset password mismatch error when password is cleared
+    setPasswordMismatch(false);
   };
 
   const toggleShowPassword = () => {
@@ -55,7 +71,7 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.phone || !form.password) {
+    if (!form.name || !form.email || !form.phone || !form.password || !form.confirmPassword) {
       Swal.fire({
         title: "Error!",
         text: "Mohon lengkapi form yang disediakan",
@@ -89,6 +105,11 @@ const Register = () => {
       return;
     }
 
+    if (form.password !== form.confirmPassword) {
+      setPasswordMismatch(true);
+      return;
+    }
+
     try {
       setLoading(true);
       const email = form.email;
@@ -114,7 +135,7 @@ const Register = () => {
         } else if (response.code === 400) {
           Swal.fire({
             title: "Error!",
-            text: "Emailtelah digunakan",
+            text: "Email telah digunakan",
             icon: "error",
             showConfirmButton: true,
             confirmButtonText: "OK!",
@@ -213,6 +234,21 @@ const Register = () => {
               />
             )}
           </div>
+          <div className="relative">
+            <Inputs
+              id="confirmPassword"
+              placeholder="**********"
+              label="Confirm Password"
+              type={showPassword ? "text" : "password"}
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              required
+            />
+            {passwordMismatch && (
+              <div className="text-red-500 text-xs mt-1">Password didn't match</div>
+            )}
+          </div>
 
           {form.password && (
             <div className="my-2">
@@ -237,7 +273,7 @@ const Register = () => {
                         ? "Kuat"
                         : passwordStrength.score === 2
                         ? "Sedang"
-                       : "Lemah"}
+                        : "Lemah"}
                     </span>
                   </div>
                 </div>
@@ -298,7 +334,7 @@ const Register = () => {
                   "Sign Up"
                 )
               }
-              disabled={loading}
+              disabled={loading || passwordMismatch} // Disable button if there is a password mismatch
             />
           </div>
         </form>
