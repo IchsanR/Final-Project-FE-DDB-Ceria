@@ -1,5 +1,5 @@
 import { Navs } from "../components";
-import { ForgetPassword, Home, Login, Register, Verificationpage } from "../pages";
+import { CreatePassword, ForgetPassword, ForgetVerification, Home, Login, Register, Verificationpage } from "../pages";
 import NotFound from "../pages/NotFound";
 
 const routes = [
@@ -33,6 +33,16 @@ const routes = [
 		path: "forgot-password",
 		layout: false,
 	},
+	{
+		elements: <ForgetVerification />,
+		path: "verification",
+		layout: false
+	},
+	{
+		elements: <CreatePassword />,
+		path: "setpassword",
+		layout: false
+	}
 ];
 
 export default routes;

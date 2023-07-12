@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { loginUser } from "../api/user";
+import { sendEmailForgotPassword } from "../api/user";
 import { revertAll } from "../api/resetState";
 
 const initialState = {
@@ -9,9 +9,9 @@ const initialState = {
   isFulfilled: false
 };
 
-const loginReducer = createReducer(initialState, (builder) => {
+const sendEmailForgetReducer = createReducer(initialState, (builder) => {
   // pending
-  builder.addCase(loginUser.pending, (state) => {
+  builder.addCase(sendEmailForgotPassword.pending, (state) => {
     return {
       ...state,
       data: [],
@@ -22,7 +22,7 @@ const loginReducer = createReducer(initialState, (builder) => {
   });
 
   // fulfilled
-  builder.addCase(loginUser.fulfilled, (state, action) => {
+  builder.addCase(sendEmailForgotPassword.fulfilled, (state, action) => {
     return {
       ...state,
       data: action.payload.data,
@@ -33,7 +33,7 @@ const loginReducer = createReducer(initialState, (builder) => {
   });
 
   // rejected
-  builder.addCase(loginUser.rejected, (state, action) => {
+  builder.addCase(sendEmailForgotPassword.rejected, (state, action) => {
     return {
       ...state,
       data: action.error,
@@ -43,8 +43,7 @@ const loginReducer = createReducer(initialState, (builder) => {
     };
   });
 
-  // Logout
   builder.addCase(revertAll, () => initialState);
 });
 
-export default loginReducer;
+export default sendEmailForgetReducer;

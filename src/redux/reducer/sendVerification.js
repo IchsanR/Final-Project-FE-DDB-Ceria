@@ -4,7 +4,8 @@ import { sendEmailVerification } from "../api/user";
 const initialState = {
   data: [],
   isLoading: true,
-  isError: false
+  isError: false,
+  isFulfilled: false
 };
 
 const sendVerificationReducer = createReducer(initialState, (builder) => {
@@ -14,7 +15,8 @@ const sendVerificationReducer = createReducer(initialState, (builder) => {
       ...state,
       data: [],
       isLoading: true,
-      isError: false
+      isError: false,
+      isFulfilled: false
     };
   });
 
@@ -22,9 +24,10 @@ const sendVerificationReducer = createReducer(initialState, (builder) => {
   builder.addCase(sendEmailVerification.fulfilled, (state, action) => {
     return {
       ...state,
-      data: action.payload,
+      data: action.payload.data,
       isLoading: false,
-      isError: false
+      isError: false,
+      isFulfilled: true
     };
   });
 
@@ -32,9 +35,10 @@ const sendVerificationReducer = createReducer(initialState, (builder) => {
   builder.addCase(sendEmailVerification.rejected, (state, action) => {
     return {
       ...state,
-      data: action.payload,
+      data: action,
       isLoading: false,
-      isError: true
+      isError: true,
+      isFulfilled: false
     };
   });
 });
