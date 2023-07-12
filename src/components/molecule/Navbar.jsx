@@ -18,6 +18,8 @@ import Logo from "../atom/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { userAvatar } from "../../assets";
 import { Toolbar } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { revertAll } from "../../redux/api/resetState";
 
 const drawerWidth = 250;
 
@@ -25,14 +27,15 @@ function ResponsiveDrawer({ window, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
-  const email =
-    localStorage.getItem("email") || sessionStorage.getItem("email");
+  const email = localStorage.getItem("email") || sessionStorage.getItem("email");
+  const dispatch = useDispatch();
 
   const handleLogout = (e) => {
     e.preventDefault();
 
     localStorage.clear();
     sessionStorage.clear();
+    dispatch(revertAll());
     return navigate("/login");
   };
 
