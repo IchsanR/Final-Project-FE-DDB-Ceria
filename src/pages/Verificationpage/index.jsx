@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { VerificationLayout } from "../../components";
+import { Logo, Buttons, Spinner } from "../../components";
 import {
   compareVerificationCode,
   registerUser,
@@ -157,7 +157,7 @@ const VerificationPage = () => {
         setLoading(true);
 
         const response = await dispatch(sendEmailVerification({ email: newEmail }));
-
+        console.log(response.payload.data.code)
         if (response.payload.data.code === 400) {
           Swal.fire({
             title: "Error!",
@@ -234,8 +234,7 @@ const VerificationPage = () => {
       const response = await dispatch(compareVerificationCode({ email, code }));
 
     
-
-      if (response.payload.message === "Success Verification Code") {
+      if (response.payload.data.message === "Success Verification Code") {
         const name = localStorage.getItem("name");
         const email = localStorage.getItem("email");
         const phone = localStorage.getItem("phone");
