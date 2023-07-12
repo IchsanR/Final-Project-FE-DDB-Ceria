@@ -10,14 +10,15 @@ const initialState = {
   status: "idle",
   error: null,
 };
+
 const getToken = () => {
   return sessionStorage.getItem("token");
 };
+
 export const fetchData = createAsyncThunk("data/fetchData", async (page) => {
   const token = getToken();
   const response = await axios.get(backendUrl +
      `/api/get-transactions-limit/${page}`,
-    // "api/get-transactions",
     {
       headers: { Authorization: `${token}` },
     }
@@ -64,8 +65,6 @@ export const filterData = createAsyncThunk(
       );
       return response.data;
     }
-    //   console.log("inidataaaaa"+start,end)
-
   }
 );
 
@@ -85,7 +84,6 @@ const dataSlice = createSlice({
         state.data = action.payload;
         state.filteredData = action.payload;
         state.totalPages = Math.ceil(action.payload['total_data'] );
-        console.log(state.totalPages)
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.status = "failed";
@@ -112,7 +110,5 @@ const dataSlice = createSlice({
 export const selectData = (state) => state.data.data
 export const totalPages = (state) => state.totalPages;
 export const selectFilteredData = (state) => state.data.filteredData;
-export const selectDataStatus = (state) => state.data.status;
-export const selectDataError = (state) => state.data.error;
 
 export default dataSlice.reducer;

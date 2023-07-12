@@ -1,5 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import axios from "axios";
 import { backendUrl } from "../../config/env.config";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const loginUser = createAsyncThunk('loginUser', ({ form }) => {
   return new Promise((resolve, reject) => {

@@ -13,7 +13,7 @@ const Login = () => {
 	});
 	const [checked, setChecked] = useState(false);
 	const navigate = useNavigate();
-	const [loginUser] = useLoginUserMutation();
+	const dispatch = useDispatch();
 	const [isLogged, setIsLogged] = useState(false);
 
 	const handleChecked = (e) => {
@@ -32,7 +32,8 @@ const Login = () => {
 	});
 
 	useEffect(() => {
-		if (response.isFulfilled && response.data.code === 200) {
+		console.log("inires"+response)
+		if (response && response.isFulfilled && response.data.code == 200) {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Success!",
@@ -53,7 +54,7 @@ const Login = () => {
 			}
 		}
 
-		if (response.isError && response.data.code === "ERR_NETWORK") {
+		if (response && response.isError && response.data.code === "ERR_NETWORK") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
@@ -64,7 +65,7 @@ const Login = () => {
 			return;
 		}
 
-		if (response.isError && response.data.code === "ERR_BAD_REQUEST") {
+		if (response && response.isError && response.data.code === "ERR_BAD_REQUEST") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
@@ -96,10 +97,6 @@ const Login = () => {
 			throw error;
 		}
 
-		loginUser(form)
-			.then((response) => {
-				handleSuccess(response);
-			});
 	};
 
 	return (
@@ -121,12 +118,12 @@ const Login = () => {
 						/>
 					</div>
 					<div className="flex justify-between my-3">
-						<div>
-							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2" onChange={(e) => handleChecked(e)} />
-							<label htmlFor="rememberMe" className="text-[#6B7280]">Remember Me</label>
+						<div className="flex">
+							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 my-auto" onChange={(e) => handleChecked(e)} />
+							<label htmlFor="rememberMe" className="text-[#6B7280] my-auto">Remember Me</label>
 						</div>
 						<div>
-							<Link to={"/"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
+							<Link to={"/forgot-password"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
 						</div>
 					</div>
 					<div className="my-6">

@@ -21,100 +21,44 @@ import "primeicons/primeicons.css"; // icons
 import ExportCsv from "../../components/molecule/ExportCsv";
 
 const TransactionPage = () => {
-  const toast = useRef(null);
   const dispatch = useDispatch();
+  const dataTable = useRef(null);
+  const toast = useRef(null);
+  const statuses = ["SUCCESS", "WAITING_FOR_DEBITTED"];
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(100);
+  const [statusF, setStatusF] = useState("");
+  const [dates, setDates] = useState(null);
+  const [showPaginator, setShowPaginator] = useState(true);
   const { data } = useSelector(selectData);
   const { totalPages, loading, error } = useSelector((state) => state.data);
   let filteredData = useSelector(selectFilteredData);
-  const [showPaginator, setShowPaginator] = useState(true);
 
+  //initiation data
   useEffect(() => {
-    //setTimeout(() => {
-      dispatch(fetchData(1));
-   // }, 200);
+    dispatch(fetchData(1));
   }, [dispatch]);
 
-  useEffect(() => {
-    // Show toast for error
-    if (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while fetching data.",
-        life: 3000,
-      });
-    }
-  }, [error]);
-
-  useEffect(() => {
-    // Show toast for pending data
-    const pendingDataTimeout = setTimeout(() => {
-      if (loading) {
-        toast.current.show({
-          severity: "info",
-          summary: "Pending",
-          detail: "Data is still loading...",
-          life: 3000,
-        });
-      }
-    }, 15000); // 15 seconds
-
-    return () => clearTimeout(pendingDataTimeout);
-  }, [loading]);
-
-  const onPageChange = (event) => {
-    dispatch(fetchData(event.page + 1));
-    setFirst(event.first);
-    setRows(event.rows);
-  };
-
-  const handleFilter = (sdate, edate) => {
-    dispatch(filterData({ status: statusF, sdate, edate }));
-    setShowPaginator(false);
-  };
-  const handleShowAll = () => {
-    dispatch(filterData({}));
-    setShowPaginator(false);
-  };
-
-  const handleResetFilter = () => {
-    setStatusF("");
-    setDates(null);
-    setFirst(0);
-    setRows(100);
-    filteredData = data;
-    dispatch(fetchData(1));
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Filter Cleared",
-      life: 3000,
-    });
-    setShowPaginator(true);
-  };
-
-  const [statusF, setStatusF] = useState("");
-  const [dates, setDates] = useState(null);
-
+  //get severity status
   const getSeverity = (status) => {
     switch (status) {
-      case "failed":
-        return "danger";
       case "SUCCESS":
         return "success";
       case "WAITING_FOR_DEBITTED":
         return "warning";
+      default:
+        return "warning";
     }
   };
+
+  //set status style in table
   const statusBodyTemplate = (rowData) => {
     return (
       <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
     );
   };
-  //filtering status
-  const statuses = ["SUCCESS", "WAITING_FOR_DEBITTED"];
+
+  //template filter status in table
   const statusFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -129,13 +73,18 @@ const TransactionPage = () => {
       />
     );
   };
+
+  // set status style in filter
   const statusItemTemplate = (option) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
-  //custom price
+
+  //set price style in table
   const balanceBodyTemplate = (rowData) => {
     return formatCurrency(rowData.price);
   };
+
+  //set format price in idr
   const formatCurrency = (value) => {
     if (value !== undefined && value !== null) {
       return value.toLocaleString("id-ID", {
@@ -144,7 +93,8 @@ const TransactionPage = () => {
       });
     }
   };
-  //filter price
+
+  //template price filter in table
   const balanceFilterTemplate = (options) => {
     return (
       <InputNumber
@@ -156,10 +106,13 @@ const TransactionPage = () => {
       />
     );
   };
-  //custom date
+
+  //set date style in table
   const dateBodyTemplate = (rowData) => {
     return formatDate(rowData.created_at);
   };
+
+  //set format date
   const formatDate = (value) => {
     if (value !== undefined && value !== null) {
       const dateValue = value ? new Date(value) : null;
@@ -171,32 +124,7 @@ const TransactionPage = () => {
     }
   };
 
-  function formatDateF(date) {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
-  const fiterDate = () => {
-    if (dates || statusF !== "") {
-      let sdate = "";
-      let edate = "";
-      if (dates) {
-        sdate = formatDateF(dates[0]);
-        edate = formatDateF(dates[1]);
-      }
-      handleFilter(sdate, edate);
-    } else {
-      toast.current.show({
-        severity: "warn",
-        summary: "warning",
-        detail: "Please Select Filter",
-        life: 3000,
-      });
-    }
-  };
-
-  //render header
+  //render header template filtering global and export csv
   const renderHeader = () => {
     return (
       <div className="flex flex-col md:flex-row md:justify-between">
@@ -223,7 +151,7 @@ const TransactionPage = () => {
             placeholder="Select Range"
             label="Filter"
             type="submit"
-            onClick={fiterDate}
+            onClick={fiterDateStatus}
             className="p-button-sm md:ml-2 bg-violet-800"
             icon="pi pi-filter"
           />
@@ -236,51 +164,96 @@ const TransactionPage = () => {
           />
         </div>
         <div className="mt-2 md:mt-0">
-          <Button
-            tooltip="Export XLS"
-            tooltipOptions={{ position: "bottom" }}
-            type="button"
-            icon="pi pi-file-excel"
-            severity="success"
-            rounded
-            onClick={exportExcel}
-            data-pr-tooltip="XLS"
-            className="mr-2 hidden"
-          />
           <ExportCsv />
         </div>
       </div>
     );
   };
-  const dt = useRef(null);
+
+  //set custom filter global date status
+  const fiterDateStatus = () => {
+    //validation date and status
+    if (dates || statusF !== "") {
+      let sdate = "";
+      let edate = "";
+      //custom format date
+      if (dates) {
+        sdate = formatDateF(dates[0]);
+        edate = formatDateF(dates[1]);
+      }
+      //send custom date to handlefilter
+      handleFilter(sdate, edate);
+    } else {
+      toast.current.show({
+        //alert no filter selected
+        severity: "warn",
+        summary: "warning",
+        detail: "Please Select Filter",
+        life: 3000,
+      });
+    }
+  };
+
+  //set custom date format
+  const formatDateF = (date) => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  //request filterdata
+  const handleFilter = (sdate, edate) => {
+    dispatch(filterData({ status: statusF, sdate, edate }));
+    setShowPaginator(false); //set show paginator from datatable
+  };
+
+  //reset filter
+  const handleResetFilter = () => {
+    setStatusF("");
+    setDates(null);
+    setFirst(0);
+    setRows(100);
+    filteredData = data;
+    dispatch(fetchData(1));
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Filter Cleared",
+      life: 3000,
+    });
+    setShowPaginator(true); //set show original paginator
+  };
+
+  //request data all
+  const handleShowAll = () => {
+    dispatch(filterData({}));
+    setShowPaginator(false);
+  };
+
+  //template save data to excel
   const exportExcel = () => {
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
-
-      // Get the range of the column to convert to string
-      const columnRange = "D2:D" + (filteredData.data.length + 1);
-
-      // Iterate over the range and convert each cell to string
       for (let rowNum = 2; rowNum <= filteredData.data.length + 1; rowNum++) {
         const cellRefB = "B" + rowNum;
         const cellRefC = "C" + rowNum;
         const cellB = worksheet[cellRefB];
-        cellB.t = "s"; // Set the cell type to string
-        cellB.v = String(cellB.v); // Convert the cell value to string
+        cellB.t = "s";
+        cellB.v = String(cellB.v);
         const cellC = worksheet[cellRefC];
-        cellC.t = "s"; // Set the cell type to string
-        cellC.v = String(cellC.v); // Convert the cell value to string
+        cellC.t = "s";
+        cellC.v = String(cellC.v);
       }
-
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer = xlsx.write(workbook, {
         bookType: "xlsx",
         type: "array",
       });
-
       saveAsExcelFile(excelBuffer, "data-transaction");
     });
   };
+
   const saveAsExcelFile = (buffer, fileName) => {
     import("file-saver").then((module) => {
       if (module && module.default) {
@@ -290,7 +263,6 @@ const TransactionPage = () => {
         const data = new Blob([buffer], {
           type: EXCEL_TYPE,
         });
-
         module.default.saveAs(
           data,
           fileName + "_export_" + new Date() + EXCEL_EXTENSION
@@ -298,6 +270,8 @@ const TransactionPage = () => {
       }
     });
   };
+
+  //template paginator right side
   const paginatorRight = (
     <Button
       type="button"
@@ -308,31 +282,67 @@ const TransactionPage = () => {
       className="text-violet-800"
     />
   );
+
+  //template paginator left side
   const paginatorLeft = (
     <Button
       type="button"
-      icon="pi pi-download hidden"
+      icon="pi pi-download"
       text
       onClick={exportExcel}
-      tooltip="Export XLS"
+      tooltip="Save Data"
       tooltipOptions={{ position: "bottom" }}
     />
   );
+
+  //request data pagination
+  const onPageChange = (event) => {
+    dispatch(fetchData(event.page + 1));
+    setFirst(event.first);
+    setRows(event.rows);
+  };
+
+  //handler error with toast
+  useEffect(() => {
+    if (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while fetching data.",
+        life: 3000,
+      });
+    }
+  }, [error]);
+
+  //handler panding waiting with toast
+  useEffect(() => {
+    const pendingDataTimeout = setTimeout(() => {
+      if (loading) {
+        toast.current.show({
+          severity: "info",
+          summary: "Pending",
+          detail: "Data is still loading...",
+          life: 3000,
+        });
+      }
+    }, 15000);
+    return () => clearTimeout(pendingDataTimeout);
+  }, [loading]);
+
   const header = renderHeader();
 
   return (
     <>
-      {/* <Navs /> */}
       <div className="card">
         <Toast ref={toast} />
         <DataTable
-          ref={dt}
+          ref={dataTable}
           header={header}
           paginator={!showPaginator}
           rows={5}
           loading={loading}
           rowsPerPageOptions={[5, 10, 25, 50]}
-          value={filteredData.code == 200 ? filteredData.data : data}
+          value={filteredData.code === 200 ? filteredData.data : data}
           tableStyle={{ minWidth: "50rem" }}
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
@@ -340,8 +350,10 @@ const TransactionPage = () => {
           scrollHeight="480px"
           paginatorRight={paginatorRight}
           paginatorLeft={paginatorLeft}
-          emptyMessage={"No data found, please click show all to found your data"}
-          sortField="id" 
+          emptyMessage={
+            "No data found, please click show all to found your data"
+          }
+          sortField="id"
           sortOrder={-1}
         >
           <Column field="id" sortable header="Id"></Column>
@@ -393,7 +405,7 @@ const TransactionPage = () => {
             rows={rows}
             template="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} to {last} of {totalRecords}"
-            totalRecords={filteredData.code == 200 ? totalPages : totalPages}
+            totalRecords={filteredData.code === 200 ? totalPages : totalPages}
             onPageChange={onPageChange}
             rightContent={paginatorRight}
             leftContent={paginatorLeft}

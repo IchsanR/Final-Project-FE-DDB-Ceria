@@ -1,11 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 import storage from "redux-persist/lib/storage";
-import { userApi } from "./api/user.js";
-import rootReducer from "./reducer/reducer"
+import rootReducer from "./reducer/reducer";
 import { persistReducer } from "redux-persist";
-import dataReducer from './slice/dataSlice'
-import { apiModal } from "./api/exportCsvApi";
+import { persistStore } from "redux-persist";
+import dataReducer from './slice/dataSlice';
 import { revertSlice } from "./api/resetState";
 
 const persistConfig = {
@@ -15,13 +14,11 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
- const store = configureStore({
-  reducer: {
-    data: dataReducer,
-    persistedReducer
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(thunk, userApi.middleware),
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: [thunk]
 });
 
-export default store
+export const persistor = persistStore(store);
+
+export default store;

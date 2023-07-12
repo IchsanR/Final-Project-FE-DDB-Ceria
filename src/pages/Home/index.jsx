@@ -10,14 +10,14 @@ import "primeicons/primeicons.css"; // icons
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { data } = useSelector(selectData);
+  const { data, error } = useSelector(selectData);
   const { totalPages } = useSelector((state) => state.data);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
+
   useEffect(() => {
     dispatch(fetchData(1));
   }, [dispatch]);
-
   useEffect(() => {
     if (data && data.length > 0) {
       setIsDataLoaded(true);
@@ -73,7 +73,6 @@ const Home = () => {
 
   const sortedData = isDataLoaded && data ? [...data].sort((a, b) => b.id - a.id) : [];
   const homeData = sortedData.slice(0, 10);
-  
 
   return (
     <Fragment>
@@ -87,12 +86,12 @@ const Home = () => {
         </div>
       </div>
       <div className="card">
-        {isDataLoaded && (
+        {isDataLoaded && !error && (
           <div className="flex flex-wrap">
             <div className="w-full">
               <h2 className="text-lg font-semibold mb-2">Last 10 Transactions</h2>
               <DataTable className="w-full mt-4 p-datatable-sm" value={homeData}>
-                <Column field="id" header="Id"  />
+                <Column field="id" header="Id" />
                 <Column field="oda_number" dataType="numeric" header="Oda Number" />
                 <Column field="bill_amount" body={balanceBodyTemplate} dataType="numeric" header="Price" />
                 <Column field="created_at" dataType="date" header="Date" body={dateBodyTemplate} />
@@ -101,10 +100,12 @@ const Home = () => {
             </div>
           </div>
         )}
+        {error && (
+          <div>An error occurred: {error}</div>
+        )}
       </div>
     </Fragment>
   );
 };
 
 export default Home;
-  
