@@ -13,9 +13,14 @@ const VerificationPage = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
   const [resendTimer, setResendTimer] = useState(15);
   const [loading, setLoading] = useState(false);
+  const [correctEmail, setCorrectEmail] = useState("");
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [isEmailUpdated, setIsEmailUpdated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const email = localStorage.getItem("verificationEmail");
+  const email = localStorage.getItem("email");
+  const verificationEmail = localStorage.getItem("verificationEmail");
   const dispatch = useDispatch();
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
@@ -88,8 +93,8 @@ const VerificationPage = () => {
   const handleResend = async () => {
     try {
       Swal.fire({
-        title: "Mohon ditunggu",
-        text: "Sedang mengirim ulang email verifikasi...",
+        title: "Please Wait...",
+        text: "Resending verification email...",
         icon: "info",
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -106,13 +111,13 @@ const VerificationPage = () => {
 
       setLoading(true);
 
-      await dispatch(sendEmailVerification({ email }));
+      await dispatch(sendEmailVerification({ email: verificationEmail }));
 
       setResendTimer(15);
 
       Swal.fire({
-        title: "Tautan Verifikasi Terkirim",
-        text: "Tautan verifikasi telah dikirim ulang ke email Anda.",
+        title: "Verification Link Sent",
+        text: "The verification link has been resent to your email.",
         icon: "success",
         timer: 5000,
       });
@@ -123,7 +128,7 @@ const VerificationPage = () => {
 
       Swal.fire({
         title: "Error!",
-        text: "Terjadi kesalahan saat mengirim ulang tautan verifikasi",
+        text: "There was an error while resending the verification link.",
         timer: 2500,
         icon: "error",
         showConfirmButton: false,
@@ -132,23 +137,105 @@ const VerificationPage = () => {
     }
   };
 
+  const handleUpdateEmail = () => {
+    setIsUpdatingEmail(true);
+    setCorrectEmail("");
+  };
+
+  const handleEmailChange = (e) => {
+    setNewEmail(e.target.value);
+  };
+
+  const handleCancelUpdateEmail = () => {
+    setIsUpdatingEmail(false);
+    setNewEmail("");
+  };
+
+  const handleUpdateEmailSubmit = async () => {
+    if (newEmail !== "") {
+      try {
+        setLoading(true);
+
+        const response = await dispatch(sendEmailVerification({ email: newEmail }));
+
+        if (response.payload.data.code === 400) {
+          Swal.fire({
+            title: "Error!",
+            text: "The email has already been used. Please use a different email.",
+            timer: 2500,
+            icon: "error",
+            showConfirmButton: false,
+          });
+          setLoading(false);
+          return;
+        }
+
+        localStorage.setItem("email", newEmail);
+        localStorage.setItem("verificationEmail", newEmail);
+        setIsEmailUpdated(true);
+        setResendTimer(15);
+        setIsUpdatingEmail(false);
+  
+        Swal.fire({
+          title: "Please Wait...",
+          text: "Sending a new verification email...",
+          icon: "info",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          onBeforeOpen: () => {
+            Swal.showLoading();
+          },
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            Swal.hideLoading();
+          },
+        });
+  
+    
+  
+        await dispatch(sendEmailVerification({ email: newEmail }));
+  
+        Swal.fire({
+          title: "Verification Link Sent",
+          text: "The verification link has been sent to your new email.",
+          icon: "success",
+          timer: 5000,
+        });
+  
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+  
+        Swal.fire({
+          title: "Error!",
+          text: "There was an error while sending the new verification email.",
+          timer: 2500,
+          icon: "error",
+          showConfirmButton: false,
+        });
+        throw error;
+      }
+    }
+  };
+
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const code = verificationCode.join("");
 
-    // menambahkan log untuk mengecek kode OTP yang diinput
-    console.log('OTP Input: ', code);
+ 
 
     try {
       setLoading(true);
 
       const response = await dispatch(compareVerificationCode({ email, code }));
 
-      // menambahkan log untuk mengecek respons yang didapat dari server
-      console.log('Server Response: ', response);
+    
 
       if (response.payload.message === "Success Verification Code") {
-        // kode OTP valid
         const name = localStorage.getItem("name");
         const email = localStorage.getItem("email");
         const phone = localStorage.getItem("phone");
@@ -159,7 +246,6 @@ const VerificationPage = () => {
           registerUser({ form: { name, email, phone, password, role } })
         );
 
-        // setelah sukses register, hapus semua data dari localStorage
         localStorage.removeItem("name");
         localStorage.removeItem("email");
         localStorage.removeItem("phone");
@@ -167,18 +253,23 @@ const VerificationPage = () => {
         localStorage.removeItem("verificationEmail");
 
         Swal.fire({
-          title: "Verifikasi Berhasil",
-          text: "Akun Anda telah berhasil diverifikasi!",
+          title: "Verification Successful",
+          text: "Your account has been successfully verified!",
           icon: "success",
           timer: 5000,
         });
 
         navigate("/login");
       } else {
-        // kode OTP tidak valid
+        if (correctEmail !== "") {
+          await dispatch(sendEmailVerification({ email: correctEmail }));
+          localStorage.setItem("verificationEmail", correctEmail);
+          setResendTimer(15);
+        }
+
         Swal.fire({
           title: "Error!",
-          text: "Kode verifikasi tidak cocok",
+          text: "The verification code does not match.",
           timer: 2500,
           icon: "error",
           showConfirmButton: false,
@@ -189,12 +280,11 @@ const VerificationPage = () => {
     } catch (error) {
       setLoading(false);
 
-      // menambahkan log untuk mengecek error yang terjadi
-      console.error('Error: ', error);
+ 
 
       Swal.fire({
         title: "Error!",
-        text: "Terjadi kesalahan saat verifikasi",
+        text: "There was an error during the verification process.",
         timer: 2500,
         icon: "error",
         showConfirmButton: false,
@@ -204,11 +294,124 @@ const VerificationPage = () => {
     }
   };
 
-
   return (
-    <>
-      <VerificationLayout handleSubmit={handleSubmit} email={email} verificationCode={verificationCode} handleInputChange={handleInputChange} handleKeyDown={handleKeyDown} handlePaste={handlePaste} inputRefs={inputRefs} focusedInput={focusedInput} handleResend={handleResend} resendTimer={resendTimer} loading={loading} />
-    </>
+    <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
+      <header className="mb-2">
+        <Logo />
+      </header>
+      <main className="md:w-[500px] w-full max-w-md">
+        <form className="w-full" onSubmit={handleSubmit}>
+          <div className="my-6">
+            <h1 className="font-bold text-2xl">Account Verification</h1>
+          </div>
+          <div className="mb-6">
+            <p className="text-gray-700">
+              {isEmailUpdated ? (
+                <>
+                  A verification code has been sent to <strong>{verificationEmail}</strong>. Please enter the verification code to proceed.
+                </>
+              ) : (
+                <>
+                 The verification code has been sent to <strong>{email}</strong>. Please enter the verification code to proceed. Wrong email?{" "}
+                  <button
+                    type="button"
+                    className="text-blue-500 hover:text-blue-700"
+                    onClick={handleUpdateEmail}
+                  >
+                    Update email
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
+          {isUpdatingEmail ? (
+            <div className="flex items-center justify-center mb-6">
+              <input
+                type="email"
+                className="w-full px-3 py-2 border rounded focus:outline-none"
+                placeholder="New Email"
+                value={newEmail}
+                onChange={handleEmailChange}
+              />
+              <button
+                type="button"
+                className="text-red-500 hover:text-red-700 ml-4"
+                onClick={handleCancelUpdateEmail}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="text-blue-500 hover:text-blue-700 ml-4"
+                onClick={handleUpdateEmailSubmit}
+              >
+                Save
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center mb-6">
+              {verificationCode.map((value, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  className="w-12 h-12 text-4xl text-center border rounded mx-1 focus:outline-none focus:ring focus:border-blue-300"
+                  maxLength={1}
+                  value={value}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  ref={(ref) => (inputRefs.current[index] = ref)}
+                  tabIndex={focusedInput === index ? 0 : -1}
+                />
+              ))}
+            </div>
+          )}
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-gray-700">
+Not receiving the code?{" "}
+              {!isUpdatingEmail && (
+                <button
+                  type="button"
+                  className="text-blue-500 hover:text-blue-700"
+                  onClick={handleResend}
+                  disabled={resendTimer > 0}
+                >
+                  Resend the code
+                </button>
+              )}
+              {isUpdatingEmail ? (
+                <span className="text-gray-500 ml-2">Please update your email first.</span>
+              ) : (
+                resendTimer > 0 && (
+                  <span className="text-gray-500 ml-2">
+                    ({Math.floor(resendTimer / 60)}:{resendTimer % 60})
+                  </span>
+                )
+              )}
+            </p>
+          </div>
+          <div className="my-6">
+            <Buttons
+              type="submit"
+              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              description={
+                loading ? (
+                  <div className="flex items-center justify-center">
+                    <Spinner />
+                    <span className="ml-2">Please Wait...</span>
+                  </div>
+                ) : (
+                  "Verifikasi"
+                )
+              }
+              disabled={loading || isUpdatingEmail}
+            />
+          </div>
+        </form>
+      </main>
+    </div>
   );
 };
 

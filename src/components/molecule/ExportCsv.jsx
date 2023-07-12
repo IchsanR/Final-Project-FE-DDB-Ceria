@@ -44,7 +44,6 @@ const ExportCsv = () => {
           setLoading(true);
         }
       });
-    // }
   };
 
   useEffect(() => {
@@ -76,10 +75,10 @@ const ExportCsv = () => {
 
   return (
     <>
-      <Button onClick={() => setOpenModal(true)}>Export to csv</Button>
+      <Button onClick={() => setOpenModal(true)}>Exports</Button>
       {openModal && (
         <Modal show={true} onClose={() => setOpenModal(false)}>
-          <Modal.Header>Export transaction</Modal.Header>
+          <Modal.Header>Export transaction to excel</Modal.Header>
           <div className='px-5 py-5'>
             <div className='flex flex-col'>
               <label htmlFor='status' className='block text-sm font-medium text-gray-900 dark:text-white pb-2'>
