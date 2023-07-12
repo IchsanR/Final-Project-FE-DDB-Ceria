@@ -9,21 +9,18 @@ function Modal({ setOpenModal }) {
           <h1>Terms and Conditions</h1>
         </div>
         <div className={`${style.body}`}>
-          <p>
-            Berikut ini adalah contoh syarat dan ketentuan umum yang dapat digunakan sebagai referensi:
-          </p>
-          <p>
-            Penggunaan Situs Web
-            <br />
-            1.1. Dengan mengakses dan menggunakan situs web ini, Anda menyetujui untuk mematuhi semua syarat dan ketentuan yang tercantum di bawah ini. Jika Anda tidak setuju dengan syarat dan ketentuan ini, harap jangan gunakan situs web ini.
-          </p>
-          <p>
-            1.2. Anda bertanggung jawab penuh atas segala tindakan yang dilakukan melalui akun Anda pada situs web ini. Anda harus menjaga kerahasiaan informasi akun Anda dan memberikan informasi yang akurat dan terkini.
-          </p>
-          <p>
-            1.3. Kami berhak untuk mengubah atau menghentikan situs web ini, termasuk syarat dan ketentuan, kapan saja tanpa pemberitahuan sebelumnya. Anda setuju bahwa kami tidak akan bertanggung jawab atas segala perubahan, penghentian, atau ketidaktersediaan situs web ini.
-          </p>
-        </div>
+        <p>
+Website Usage
+<br />
+1.1. By accessing and using this website, you agree to comply with all the terms and conditions stated below. If you do not agree with these terms and conditions, please do not use this website.
+</p>
+<p>
+1.2. You are fully responsible for any actions taken through your account on this website. You must maintain the confidentiality of your account information and provide accurate and up-to-date information.
+</p>
+<p>
+1.3. We reserve the right to modify or discontinue this website, including the terms and conditions, at any time without prior notice. You agree that we shall not be liable for any changes, discontinuance, or unavailability of this website.
+</p>
+</div>
         <div className={`${style.footer}`}>
           <button className={`${style.cancelBtn}`} onClick={() => setOpenModal(false)}>
             Tutup
