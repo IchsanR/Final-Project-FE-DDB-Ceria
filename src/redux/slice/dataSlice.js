@@ -11,14 +11,11 @@ const initialState = {
   error: null,
 };
 
-const getToken = () => {
-  return sessionStorage.getItem("token");
-};
 
 export const fetchData = createAsyncThunk("data/fetchData", async (page) => {
-  const token = getToken();
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   const response = await axios.get(backendUrl +
-     `/api/get-transactions-limit/${page}`,
+    `/api/get-transactions-limit/${page}`,
     {
       headers: { Authorization: `${token}` },
     }
@@ -30,9 +27,9 @@ export const fetchData = createAsyncThunk("data/fetchData", async (page) => {
 export const filterData = createAsyncThunk(
   "data/filterData",
   async (params) => {
-    const token = getToken();
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const { status, sdate, edate } = params;
-    if (status === "" && sdate !=="") {
+    if (status === "" && sdate !== "") {
       const response = await axios.get(backendUrl +
         `/api/get-TransactionDate/${sdate}/${edate}/`,
         {
@@ -48,7 +45,7 @@ export const filterData = createAsyncThunk(
         }
       );
       return response.data;
-    }else if (status  && sdate !== "") {
+    } else if (status && sdate !== "") {
       const response = await axios.get(backendUrl +
         `/api/get-TransactionStatusDate/${status}/${sdate}/${edate}/`,
         {
@@ -56,7 +53,7 @@ export const filterData = createAsyncThunk(
         }
       );
       return response.data;
-    }else {
+    } else {
       const response = await axios.get(backendUrl +
         "/api/get-transactions/",
         {
@@ -83,7 +80,7 @@ const dataSlice = createSlice({
         state.status = "succeeded";
         state.data = action.payload;
         state.filteredData = action.payload;
-        state.totalPages = Math.ceil(action.payload['total_data'] );
+        state.totalPages = Math.ceil(action.payload['total_data']);
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.status = "failed";
@@ -107,7 +104,7 @@ const dataSlice = createSlice({
   },
 });
 
-export const selectData = (state) => state.data.data
+export const selectData = (state) => state.data.data;
 export const totalPages = (state) => state.totalPages;
 export const selectFilteredData = (state) => state.data.filteredData;
 

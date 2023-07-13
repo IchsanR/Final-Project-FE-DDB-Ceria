@@ -24,6 +24,18 @@ const CreatePassword = () => {
   const id = localStorage.getItem("id");
   const code = localStorage.getItem('code');
 
+  useEffect(() => {
+    if (!code) {
+      Swal.fire({
+        title: "Error!",
+        text: `Can't access this page!`,
+        icon: "error",
+        timer: 3000,
+      });
+      return navigate('/login');
+    }
+  }, []);
+
   const handlePasswordChange = (e) => {
     const passwordResult = zxcvbn(password);
 
