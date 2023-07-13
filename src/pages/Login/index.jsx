@@ -23,9 +23,17 @@ const Login = () => {
 		if (e.target.checked === false) return setChecked(false);
 	};
 
+	const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 	useEffect(() => {
-		localStorage.clear();
-		sessionStorage.clear();
+		if (token) {
+			Swal.fire({
+				title: "Error!",
+				text: "You've logged in",
+				icon: "error",
+				timer: 3000,
+			});
+			return navigate('/');
+		}
 	}, []);
 
 	const response = useSelector((state) => {
