@@ -16,6 +16,19 @@ const ForgetPassword = () => {
     return state.sendEmailForget;
   });
 
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  useEffect(() => {
+    if (token) {
+      Swal.fire({
+        title: "Error!",
+        text: "You've logged in",
+        icon: "error",
+        timer: 3000,
+      });
+      return navigate('/');
+    }
+  }, []);
+
   useEffect(() => {
     if (response.isFulfilled && response.data.code === 200) {
       setIsSent(false);
