@@ -44,7 +44,7 @@ const loginReducer = createReducer(initialState, (builder) => {
   });
 
   // Logout
-  // builder.addCase(revertAll, () => initialState);
+  builder.addCase(revertAll, () => initialState);
 });
 
 export default loginReducer;

@@ -16,13 +16,15 @@ const ForgetVerification = () => {
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
 
-  const codes = localStorage.getItem('code');
-  const users = localStorage.getItem('id');
-
   useEffect(() => {
-    if (codes || users) {
-      localStorage.removeItem('code');
-      localStorage.removeItem('id');
+    if (!email) {
+      Swal.fire({
+        title: "Error!",
+        text: `Can't access this page!`,
+        icon: "error",
+        timer: 3000,
+      });
+      return navigate('/login');
     }
   }, []);
 

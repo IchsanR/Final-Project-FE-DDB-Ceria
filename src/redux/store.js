@@ -12,13 +12,13 @@ const persistConfig = {
   storage,
 };
 
-// const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: [thunk]
 });
 
-// export const persistor = persistStore(store);
+export const persistor = persistStore(store);
 
 export default store;

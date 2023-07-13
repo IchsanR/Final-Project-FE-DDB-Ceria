@@ -33,8 +33,8 @@ const Login = () => {
 	});
 
 	useEffect(() => {
-		console.log("inires" + response);
-		if (response && response.isFulfilled && response.data.code == 200) {
+		dispatch(revertAll());
+		if (response.isFulfilled && response.data.code == 200) {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Success!",
@@ -57,7 +57,7 @@ const Login = () => {
 			}
 		}
 
-		if (response && response.isError && response.data.code === "ERR_NETWORK") {
+		if (response.isError && response.data.code === "ERR_NETWORK") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
@@ -68,7 +68,7 @@ const Login = () => {
 			return;
 		}
 
-		if (response && response.isError && response.data.code === "ERR_BAD_REQUEST") {
+		if (response.isError && response.data.code === "ERR_BAD_REQUEST") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
