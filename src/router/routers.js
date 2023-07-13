@@ -1,10 +1,10 @@
 import { Navs } from "../components";
 import NotFound from "../pages/NotFound";
-import { Home, Login, Register, TransactionPage,Verificationpage, CreatePassword, ForgetPassword, ForgetVerification } from "../pages";
+import { Home, Login, Register, TransactionPage, Verificationpage, CreatePassword, ForgetPassword, ForgetVerification } from "../pages";
 
 const routes = [
 	{
-		elements: <Navs children={<Home/>} />,
+		elements: <Navs children={<Home />} />,
 		path: "/",
 		layout: true,
 	},
@@ -24,9 +24,9 @@ const routes = [
 		layout: false,
 	},
 	{
-		elements: <Navs children={<TransactionPage/>} />,
+		elements: <Navs children={<TransactionPage />} />,
 		path: "transaction-page",
-		layout: false,
+		layout: true,
 	},
 	{
 		elements: <Verificationpage />,
