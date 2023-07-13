@@ -16,6 +16,16 @@ const ForgetVerification = () => {
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
 
+  const codes = localStorage.getItem('code');
+  const users = localStorage.getItem('id');
+
+  useEffect(() => {
+    if (codes || users) {
+      localStorage.removeItem('code');
+      localStorage.removeItem('id');
+    }
+  }, []);
+
   useEffect(() => {
     let timer;
     if (resendTimer > 0) {
