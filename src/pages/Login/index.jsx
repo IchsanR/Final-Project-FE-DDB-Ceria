@@ -38,7 +38,7 @@ const Login = () => {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Success!",
-				text: `Selamat datang ${response.data.data[0].name}`,
+				text: `Welcome ${response.data.data[0].name}`,
 				icon: "success",
 				timer: 3000,
 			});
