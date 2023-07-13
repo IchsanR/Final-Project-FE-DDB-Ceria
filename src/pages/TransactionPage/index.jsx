@@ -173,7 +173,6 @@ const TransactionPage = () => {
   //set custom filter global date status
   const fiterDateStatus = () => {
     //validation date and status
-    console.log(dates)
     if ((dates && (dates[0] && dates[1]))|| statusF !== "") {
       let sdate = "";
       let edate = "";
