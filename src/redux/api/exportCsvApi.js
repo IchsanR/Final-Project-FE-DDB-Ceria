@@ -16,9 +16,9 @@ export const apiExportCsv = (token, status, startDate, endDate) => {
         ? `?status=${setting.status}` 
         : setting.startDate && setting.endDate ? `?start_date=${setting.startDate}&end_date=${setting.endDate}` : ''
     }`, {
-      headers: {
-        Authorization: `${token}`,
-      }
+    headers: {
+      Authorization: `${token}`,
     }
+  }
   );
 };

@@ -17,6 +17,7 @@ const VerificationPage = () => {
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [isEmailUpdated, setIsEmailUpdated] = useState(false);
+  const [isVerifS, setIsVerifS] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const email = localStorage.getItem("email");
@@ -26,6 +27,20 @@ const VerificationPage = () => {
   const [focusedInput, setFocusedInput] = useState(0);
 
   useEffect(() => {
+    const hasMissingData = !email || !verificationEmail;
+    if (isVerifS==false && hasMissingData ) {
+      Swal.fire({
+        title: "Error!",
+        text: "Required data is missing. Please go back and provide the necessary information.",
+        timer: 2500,
+        icon: "error",
+        showConfirmButton: false,
+      });
+      navigate("/login");
+    }
+  }, [email, verificationEmail, navigate]);
+  
+  useEffect(() => {
     let timer;
     if (resendTimer > 0) {
       timer = setTimeout(() => {
@@ -34,13 +49,13 @@ const VerificationPage = () => {
     }
     return () => clearTimeout(timer);
   }, [resendTimer]);
-
+  
   const handleInputChange = useCallback(
     (index, value) => {
       const newVerificationCode = [...verificationCode];
       newVerificationCode[index] = value;
       setVerificationCode(newVerificationCode);
-
+  
       if (value.length === 1 && index < inputRefs.current.length - 1) {
         inputRefs.current[index + 1].focus();
       }
@@ -48,7 +63,7 @@ const VerificationPage = () => {
     },
     [verificationCode]
   );
-
+  
   const handleKeyDown = useCallback(
     (index, event) => {
       if (
@@ -74,19 +89,19 @@ const VerificationPage = () => {
     },
     [verificationCode]
   );
-
+  
   const handlePaste = (event) => {
     event.preventDefault();
     const pastedData = event.clipboardData.getData("text");
     const pastedCharacters = pastedData.split("").slice(0, 4);
-
+  
     const newVerificationCode = [...verificationCode];
     for (let i = 0; i < 4; i++) {
       if (pastedCharacters[i]) {
         newVerificationCode[i] = pastedCharacters[i];
       }
     }
-
+  
     setVerificationCode(newVerificationCode);
   };
 
@@ -250,7 +265,10 @@ const VerificationPage = () => {
         localStorage.removeItem("phone");
         localStorage.removeItem("password");
         localStorage.removeItem("verificationEmail");
+        setIsVerifS(true)
 
+
+      
         Swal.fire({
           title: "Verification Successful",
           text: "Your account has been successfully verified!",
