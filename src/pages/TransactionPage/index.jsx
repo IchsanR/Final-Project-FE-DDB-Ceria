@@ -234,6 +234,7 @@ const TransactionPage = () => {
 
   //template save data to excel
   const exportExcel = () => {
+    if(filteredData.data){
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
       for (let rowNum = 2; rowNum <= filteredData.data.length + 1; rowNum++) {
@@ -253,6 +254,14 @@ const TransactionPage = () => {
       });
       saveAsExcelFile(excelBuffer, "data-transaction");
     });
+  }else {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "An error no data.",
+      life: 3000,
+    });
+  }
   };
 
   const saveAsExcelFile = (buffer, fileName) => {
