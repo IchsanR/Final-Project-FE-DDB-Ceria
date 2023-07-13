@@ -290,7 +290,7 @@ const TransactionPage = () => {
       icon="pi pi-download"
       text
       onClick={exportExcel}
-      tooltip="Save Data"
+      tooltip="Download Data Table"
       tooltipOptions={{ position: "bottom" }}
     />
   );
