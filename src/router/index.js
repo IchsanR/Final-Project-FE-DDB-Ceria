@@ -1,4 +1,4 @@
-import React from "react";
+import { Login } from "../pages";
 import {
 	BrowserRouter,
 	Navigate,
@@ -8,6 +8,13 @@ import {
 } from "react-router-dom";
 import Swal from "sweetalert2";
 import routers from "./routers";
+const routes = [
+	{
+		elements: <Login></Login>,
+		path: "/login",
+		layout: false,
+	},
+];
 
 const Router = () => {
 	const PrivateRoute = () => {

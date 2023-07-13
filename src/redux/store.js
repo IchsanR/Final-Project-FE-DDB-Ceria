@@ -3,6 +3,8 @@ import thunk from "redux-thunk";
 import storage from "redux-persist/lib/storage";
 import rootReducer from "./reducer/reducer";
 import { persistReducer } from "redux-persist";
+import { persistStore } from "redux-persist";
+import dataReducer from './slice/dataSlice';
 import { revertSlice } from "./api/resetState";
 
 const persistConfig = {
@@ -12,7 +14,11 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = configureStore({
+const store = configureStore({
   reducer: persistedReducer,
   middleware: [thunk]
 });
+
+export const persistor = persistStore(store);
+
+export default store;

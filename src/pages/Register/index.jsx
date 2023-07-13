@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Buttons, Inputs, Logo, Spinner, Passwordshowhide, Modal } from "../../components";
+import {
+  Buttons,
+  Inputs,
+  Logo,
+  Spinner,
+  Passwordshowhide,
+  Modal,
+} from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import zxcvbn from "zxcvbn";
@@ -13,6 +20,7 @@ const Register = () => {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
     role: "admin",
   });
   const [checked, setChecked] = useState(false);
@@ -21,6 +29,7 @@ const Register = () => {
     feedback: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -32,7 +41,6 @@ const Register = () => {
   const handlePasswordChange = (e) => {
     const password = e.target.value;
     const passwordResult = zxcvbn(password);
-
     setPasswordStrength({
       score: passwordResult.score,
       feedback:
@@ -41,11 +49,22 @@ const Register = () => {
     });
 
     setForm({ ...form, password: password });
+
+    setPasswordMismatch(false);
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const confirmPassword = e.target.value;
+    setForm({ ...form, confirmPassword: confirmPassword });
+
+    setPasswordMismatch(form.password !== confirmPassword);
   };
 
   const handlePasswordClear = () => {
     setPasswordStrength({ score: 0, feedback: "" });
     setForm({ ...form, password: "" });
+
+    setPasswordMismatch(false);
   };
 
   const toggleShowPassword = () => {
@@ -54,11 +73,27 @@ const Register = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
-    if (!form.name || !form.email || !form.phone || !form.password) {
+    if (!navigator.onLine) {
       Swal.fire({
         title: "Error!",
-        text: "Mohon lengkapi form yang disediakan",
+        text: "You are currently offline. Please check your internet connection.",
+        timer: 2500,
+        icon: "error",
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (
+      !form.name ||
+      !form.email ||
+      !form.phone ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
+      Swal.fire({
+        title: "Error!",
+        text: "Please complete the provided form",
         icon: "error",
         showConfirmButton: true,
         confirmButtonText: "OK!",
@@ -69,7 +104,7 @@ const Register = () => {
     if (checked === false) {
       Swal.fire({
         title: "Error!",
-        text: "Mohon terima persyaratan pengguna",
+        text: "Please accept the user terms and conditions",
         icon: "error",
         showConfirmButton: true,
         confirmButtonText: "OK!",
@@ -80,12 +115,16 @@ const Register = () => {
     if (passwordStrength.score < 3) {
       Swal.fire({
         title: "Error!",
-        text:
-          "Kata sandi Anda lemah dan mudah ditebak, mohon perkuat kata sandi Anda",
+        text: "Your password is weak and easy to guess, please strengthen your password",
         icon: "error",
         showConfirmButton: true,
         confirmButtonText: "OK!",
       });
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setPasswordMismatch(true);
       return;
     }
 
@@ -94,11 +133,10 @@ const Register = () => {
       const email = form.email;
 
       const handleSuccess = (response) => {
-        console.log(response);
         if (response.code === 200) {
           Swal.fire({
-            title: "Pendaftaran Berhasil",
-            text: `Silakan periksa email Anda ${form.name} untuk verifikasi.`,
+            title: "Registration Successful",
+            text: `Please check your email ${form.name} for verification.`,
             icon: "success",
             timer: 10000,
           });
@@ -114,7 +152,7 @@ const Register = () => {
         } else if (response.code === 400) {
           Swal.fire({
             title: "Error!",
-            text: "Emailtelah digunakan",
+            text: "Email has been used",
             icon: "error",
             showConfirmButton: true,
             confirmButtonText: "OK!",
@@ -122,7 +160,7 @@ const Register = () => {
         } else {
           Swal.fire({
             title: "Error!",
-            text: "Gagal mengirim email verifikasi",
+            text: "Failed to send verification email",
             timer: 2500,
             icon: "error",
             showConfirmButton: false,
@@ -134,7 +172,7 @@ const Register = () => {
     } catch (error) {
       Swal.fire({
         title: "Error!",
-        text: "Gagal melakukan koneksi ke server",
+        text: "Failed to connect to the server",
         timer: 2500,
         icon: "error",
         showConfirmButton: false,
@@ -197,7 +235,7 @@ const Register = () => {
           <div className="relative">
             <Inputs
               id="password"
-              placeholder="**********"
+              placeholder=""
               label="Password"
               type={showPassword ? "text" : "password"}
               name="password"
@@ -213,14 +251,30 @@ const Register = () => {
               />
             )}
           </div>
-
+          <div className="relative">
+            <Inputs
+              id="confirmPassword"
+              placeholder=""
+              label="Confirm Password"
+              type={showPassword ? "text" : "password"}
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              required
+            />
+            {passwordMismatch && (
+              <div className="text-red-500 text-xs mt-1">
+                Password didn't match
+              </div>
+            )}
+          </div>
           {form.password && (
             <div className="my-2">
               <div className="relative pt-1">
                 <div className="flex mb-2 items-center justify-between">
                   <div>
                     <span className="text-sm font-semibold inline-block">
-                      Kekuatan Kata Sandi:
+                      Password Strength:
                     </span>
                   </div>
                   <div className="text-right">
@@ -234,10 +288,10 @@ const Register = () => {
                       }`}
                     >
                       {passwordStrength.score >= 3
-                        ? "Kuat"
+                        ? "Strong"
                         : passwordStrength.score === 2
-                        ? "Sedang"
-                       : "Lemah"}
+                        ? "Medium"
+                        : "Weak"}
                     </span>
                   </div>
                 </div>
@@ -298,7 +352,7 @@ const Register = () => {
                   "Sign Up"
                 )
               }
-              disabled={loading}
+              disabled={loading || passwordMismatch}
             />
           </div>
         </form>

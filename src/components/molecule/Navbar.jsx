@@ -49,7 +49,7 @@ function ResponsiveDrawer({ window, children }) {
         <Logo width={"md:w-[90px] w-[60px]"} height={"md:h-[30px] h-[20px]"} />
       </div>
       <List>
-        <Link>
+        <Link to={"/"}>
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -59,7 +59,7 @@ function ResponsiveDrawer({ window, children }) {
             </ListItemButton>
           </ListItem>
         </Link>
-        <Link>
+        <Link to={"/transaction-page"}>
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -84,7 +84,8 @@ function ResponsiveDrawer({ window, children }) {
     </div>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex", position: "sticky" }}>
@@ -104,7 +105,11 @@ function ResponsiveDrawer({ window, children }) {
             <MenuIcon />
           </IconButton>
           <div className="flex items-center">
-            <img src={userAvatar} alt="user" className="w-9 sm:w-12 h-9 sm:h-12" />
+            <img
+              src={userAvatar}
+              alt="user"
+              className="w-9 sm:w-12 h-9 sm:h-12"
+            />
             <div className="ml-3">
               <p>{name}</p>
               <p className="text-slate-500">{email}</p>
@@ -127,7 +132,10 @@ function ResponsiveDrawer({ window, children }) {
           }}
           sx={{
             display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
@@ -136,7 +144,10 @@ function ResponsiveDrawer({ window, children }) {
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >
@@ -145,7 +156,11 @@ function ResponsiveDrawer({ window, children }) {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+        }}
       >
         <Toolbar />
         {children}
