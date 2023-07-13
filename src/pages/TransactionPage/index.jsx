@@ -173,11 +173,12 @@ const TransactionPage = () => {
   //set custom filter global date status
   const fiterDateStatus = () => {
     //validation date and status
-    if (dates || statusF !== "") {
+    console.log(dates)
+    if ((dates && (dates[0] && dates[1]))|| statusF !== "") {
       let sdate = "";
       let edate = "";
       //custom format date
-      if (dates) {
+      if(dates && (dates[0] && dates[1])) {
         sdate = formatDateF(dates[0]);
         edate = formatDateF(dates[1]);
       }
@@ -290,7 +291,7 @@ const TransactionPage = () => {
       icon="pi pi-download"
       text
       onClick={exportExcel}
-      tooltip="Save Data"
+      tooltip="Download Data Table"
       tooltipOptions={{ position: "bottom" }}
     />
   );
