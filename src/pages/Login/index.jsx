@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../redux/api/user";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
+import { revertAll } from "../../redux/api/resetState";
 
 
 const Login = () => {
@@ -32,12 +33,12 @@ const Login = () => {
 	});
 
 	useEffect(() => {
-		console.log("inires"+response)
-		if (response && response.isFulfilled && response.data.code == 200) {
+		dispatch(revertAll());
+		if (response.isFulfilled && response.data.code == 200) {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Success!",
-				text: `Selamat datang ${response.data.data[0].name}`,
+				text: `Welcome ${response.data.data[0].name}`,
 				icon: "success",
 				timer: 3000,
 			});
@@ -45,16 +46,18 @@ const Login = () => {
 				sessionStorage.setItem("token", response.data.data[0].token);
 				sessionStorage.setItem("name", response.data.data[0].name);
 				sessionStorage.setItem("email", response.data.data[0].email);
+				// dispatch(revertAll());
 				return navigate("/");
 			} else {
 				localStorage.setItem("name", response.data.data[0].name);
 				localStorage.setItem("token", response.data.data[0].token);
 				localStorage.setItem("email", response.data.data[0].email);
+				// dispatch(revertAll());
 				return navigate("/");
 			}
 		}
 
-		if (response && response.isError && response.data.code === "ERR_NETWORK") {
+		if (response.isError && response.data.code === "ERR_NETWORK") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
@@ -65,7 +68,7 @@ const Login = () => {
 			return;
 		}
 
-		if (response && response.isError && response.data.code === "ERR_BAD_REQUEST") {
+		if (response.isError && response.data.code === "ERR_BAD_REQUEST") {
 			setIsLogged(false);
 			Swal.fire({
 				title: "Error!",
