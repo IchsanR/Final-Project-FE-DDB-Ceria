@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Paginator } from "primereact/paginator";
 import {
@@ -19,6 +19,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
 import ExportCsv from "../../components/molecule/ExportCsv";
+import { Helmet } from "react-helmet";
 
 const TransactionPage = () => {
   const dispatch = useDispatch();
@@ -173,16 +174,16 @@ const TransactionPage = () => {
   //set custom filter global date status
   const fiterDateStatus = () => {
     //validation date and status
-    if ((dates && (dates[0] && dates[1]))|| statusF !== "") {
+    if ((dates && (dates[0] && dates[1])) || statusF !== "") {
       let sdate = "";
       let edate = "";
       //custom format date
-      if(dates && (dates[0] && dates[1])) {
+      if (dates && (dates[0] && dates[1])) {
         sdate = formatDateF(dates[0]);
         edate = formatDateF(dates[1]);
-      }else if(dates && dates[0] ){
+      } else if (dates && dates[0]) {
         sdate = formatDateF(dates[0]);
-        edate = sdate
+        edate = sdate;
       }
       //send custom date to handlefilter  
       handleFilter(sdate, edate);
@@ -305,7 +306,7 @@ const TransactionPage = () => {
     //   tooltip="Download Data Table"
     //   tooltipOptions={{ position: "bottom" }}
     // />
-    <span/>
+    <span />
   );
 
   //request data pagination
@@ -345,7 +346,10 @@ const TransactionPage = () => {
   const header = renderHeader();
 
   return (
-    <>
+    <Fragment>
+      <Helmet>
+        <title>Transaction | DDB Ceria</title>
+      </Helmet>
       <div className="card">
         <Toast ref={toast} />
         <DataTable
@@ -425,7 +429,7 @@ const TransactionPage = () => {
           />
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 

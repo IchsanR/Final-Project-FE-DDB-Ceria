@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { compareVerificationCode, sendEmailForgotPassword } from '../../redux/api/user';
 import Swal from 'sweetalert2';
 import { revertAll } from '../../redux/api/resetState';
+import { Helmet } from 'react-helmet';
 
 const ForgetVerification = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
@@ -245,6 +246,9 @@ const ForgetVerification = () => {
   };
   return (
     <Fragment>
+      <Helmet>
+        <title>OTP Verification | DDB Ceria</title>
+      </Helmet>
       <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
         <header className="mb-2">
           <Logo />

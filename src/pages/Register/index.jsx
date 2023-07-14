@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import {
   Buttons,
   Inputs,
@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import zxcvbn from "zxcvbn";
 import { useDispatch } from "react-redux";
 import { sendEmailVerification } from "../../redux/api/user";
+import { Helmet } from "react-helmet";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -190,187 +191,189 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
-      <header className="mb-2">
-        <Logo />
-      </header>
-      <main className="md:w-[500px] w-full max-w-md">
-        <form className="w-full" onSubmit={onSubmit}>
-          <div className="my-6">
-            <h1 className="font-bold text-2xl">Create an Account</h1>
-          </div>
-          <div className="mb-3">
-            <Inputs
-              id="name"
-              placeholder="Your Name"
-              label="Name"
-              type="text"
-              name="name"
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <Inputs
-              id="email"
-              placeholder="name@company.com"
-              label="Email"
-              type="email"
-              name="email"
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <Inputs
-              id="Phone Number"
-              placeholder="0812xxxxxx"
-              label="Phone Number"
-              type="number"
-              name="phone"
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              required
-            />
-          </div>
-          <div className="relative">
-            <Inputs
-              id="password"
-              placeholder=""
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={form.password}
-              onChange={handlePasswordChange}
-              onClear={handlePasswordClear}
-              required
-            />
-            {form.password && (
-              <Passwordshowhide
-                showPassword={showPassword}
-                toggleShowPassword={toggleShowPassword}
-              />
-            )}
-          </div>
-          <div className="relative">
-            <Inputs
-              id="confirmPassword"
-              placeholder=""
-              label="Confirm Password"
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              required
-            />
-            {passwordMismatch && (
-              <div className="text-red-500 text-xs mt-1">
-                Password didn't match
-              </div>
-            )}
-          </div>
-          {form.password && (
-            <div className="my-2">
-              <div className="relative pt-1">
-                <div className="flex mb-2 items-center justify-between">
-                  <div>
-                    <span className="text-sm font-semibold inline-block">
-                      Password Strength:
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span
-                      className={`text-sm font-semibold inline-block ${
-                        passwordStrength.score >= 3
-                          ? "text-green-500"
-                          : passwordStrength.score === 2
-                          ? "text-orange-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {passwordStrength.score >= 3
-                        ? "Strong"
-                        : passwordStrength.score === 2
-                        ? "Medium"
-                        : "Weak"}
-                    </span>
-                  </div>
-                </div>
-                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
-                  <div
-                    style={{ width: `${(passwordStrength.score + 1) * 20}%` }}
-                    className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
-                      passwordStrength.score >= 3
-                        ? "bg-green-500"
-                        : passwordStrength.score === 2
-                        ? "bg-orange-500"
-                        : "bg-red-500"
-                    }`}
-                  ></div>
-                </div>
-                <div className="text-sm text-gray-500">
-                  {passwordStrength.feedback}
-                </div>
-              </div>
+    <Fragment>
+      <Helmet>
+        <title>Register Account | DDB Ceria</title>
+      </Helmet>
+      <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
+        <header className="mb-2">
+          <Logo />
+        </header>
+        <main className="md:w-[500px] w-full max-w-md">
+          <form className="w-full" onSubmit={onSubmit}>
+            <div className="my-6">
+              <h1 className="font-bold text-2xl">Create an Account</h1>
             </div>
-          )}
-
-          <div className="flex justify-between my-3">
-            <div>
-              <input
-                type="checkbox"
-                id="rememberMe"
-                className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2"
-                checked={checked}
-                onChange={handleChecked}
+            <div className="mb-3">
+              <Inputs
+                id="name"
+                placeholder="Your Name"
+                label="Name"
+                type="text"
+                name="name"
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
               />
-              <label htmlFor="rememberMe" className="text-[#6B7280]">
-                I accept{" "}
-                <button
-                  className="text-violet-800 font-semibold"
-                  onClick={handleTermsClick}
-                >
-                  Terms and Conditions
-                </button>
-              </label>
             </div>
-          </div>
-
-          <div className="my-6">
-            <Buttons
-              type="submit"
-              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              description={
-                loading ? (
-                  <div className="flex items-center justify-center">
-                    <Spinner />
-                    <span className="ml-2">Please Wait...</span>
+            <div className="mb-3">
+              <Inputs
+                id="email"
+                placeholder="name@company.com"
+                label="Email"
+                type="email"
+                name="email"
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <Inputs
+                id="Phone Number"
+                placeholder="0812xxxxxx"
+                label="Phone Number"
+                type="number"
+                name="phone"
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                required
+              />
+            </div>
+            <div className="relative">
+              <Inputs
+                id="password"
+                placeholder=""
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handlePasswordChange}
+                onClear={handlePasswordClear}
+                required
+              />
+              {form.password && (
+                <Passwordshowhide
+                  showPassword={showPassword}
+                  toggleShowPassword={toggleShowPassword}
+                />
+              )}
+            </div>
+            <div className="relative">
+              <Inputs
+                id="confirmPassword"
+                placeholder=""
+                label="Confirm Password"
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={form.confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                required
+              />
+              {passwordMismatch && (
+                <div className="text-red-500 text-xs mt-1">
+                  Password didn't match
+                </div>
+              )}
+            </div>
+            {form.password && (
+              <div className="my-2">
+                <div className="relative pt-1">
+                  <div className="flex mb-2 items-center justify-between">
+                    <div>
+                      <span className="text-sm font-semibold inline-block">
+                        Password Strength:
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span
+                        className={`text-sm font-semibold inline-block ${passwordStrength.score >= 3
+                            ? "text-green-500"
+                            : passwordStrength.score === 2
+                              ? "text-orange-500"
+                              : "text-red-500"
+                          }`}
+                      >
+                        {passwordStrength.score >= 3
+                          ? "Strong"
+                          : passwordStrength.score === 2
+                            ? "Medium"
+                            : "Weak"}
+                      </span>
+                    </div>
                   </div>
-                ) : (
-                  "Sign Up"
-                )
-              }
-              disabled={loading || passwordMismatch}
-            />
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                    <div
+                      style={{ width: `${(passwordStrength.score + 1) * 20}%` }}
+                      className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${passwordStrength.score >= 3
+                          ? "bg-green-500"
+                          : passwordStrength.score === 2
+                            ? "bg-orange-500"
+                            : "bg-red-500"
+                        }`}
+                    ></div>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {passwordStrength.feedback}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-between my-3">
+              <div>
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  className="w-4 h-4 mr-3 top-1/2 relative -translate-y-1/2"
+                  checked={checked}
+                  onChange={handleChecked}
+                  required
+                />
+                <label htmlFor="rememberMe" className="text-[#6B7280]">
+                  I accept{" "}
+                  <button
+                    className="text-violet-800 font-semibold"
+                    onClick={handleTermsClick}
+                  >
+                    Terms and Conditions
+                  </button>
+                </label>
+              </div>
+            </div>
+
+            <div className="my-6">
+              <Buttons
+                type="submit"
+                classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                description={
+                  loading ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner />
+                      <span className="ml-2">Please Wait...</span>
+                    </div>
+                  ) : (
+                    "Sign Up"
+                  )
+                }
+                disabled={loading || passwordMismatch}
+              />
+            </div>
+          </form>
+
+          <div>
+            <p className="text-[#6B7280]">
+              Already have an account?{" "}
+              <span>
+                <Link to="/login" className="text-violet-800 font-semibold">
+                  Login Here
+                </Link>
+              </span>
+            </p>
           </div>
-        </form>
+        </main>
 
-        <div>
-          <p className="text-[#6B7280]">
-            Already have an account?{" "}
-            <span>
-              <Link to="/login" className="text-violet-800 font-semibold">
-                Login Here
-              </Link>
-            </span>
-          </p>
-        </div>
-      </main>
-
-      {openModal && <Modal setOpenModal={setOpenModal} />}
-    </div>
+        {openModal && <Modal setOpenModal={setOpenModal} />}
+      </div>
+    </Fragment>
   );
 };
 

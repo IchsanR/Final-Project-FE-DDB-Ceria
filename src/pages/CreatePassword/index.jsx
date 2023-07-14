@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updatePassword } from '../../redux/api/user';
 import { useNavigate } from 'react-router-dom';
 import { revertAll } from '../../redux/api/resetState';
+import { Helmet } from 'react-helmet';
 
 const CreatePassword = () => {
   const [password, setPassword] = useState("");
@@ -155,6 +156,9 @@ const CreatePassword = () => {
 
   return (
     <Fragment>
+      <Helmet>
+        <title>Create New Password | DDB Ceria</title>
+      </Helmet>
       <div className="flex justify-center items-center flex-col h-screen w-screen px-4">
         <header>
           <Logo />
