@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Buttons, Inputs, Logo, Spinner } from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../redux/api/user";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { revertAll } from "../../redux/api/resetState";
+import { Helmet } from "react-helmet";
 
 
 const Login = () => {
@@ -111,41 +112,46 @@ const Login = () => {
 	};
 
 	return (
-		<div className="flex justify-center items-center flex-col h-screen w-screen px-4">
-			<header>
-				<Logo />
-			</header>
-			<main className="md:w-[500px] w-full">
-				<form className=" w-full" onSubmit={(e) => onSubmit(e)}>
-					<div className="my-10">
-						<h1 className="font-bold text-2xl">Sign in to your account</h1>
-					</div>
-					<div className="mb-3">
-						<Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setForm({ ...form, email: e.target.value })} required
-						/>
-					</div>
-					<div className="mb-3">
-						<Inputs id={"password"} placeholder={"**********"} label={"Your Password"} type={"password"} onChange={(e) => setForm({ ...form, password: e.target.value })} required
-						/>
-					</div>
-					<div className="flex justify-between my-3">
-						<div className="flex">
-							<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 my-auto" onChange={(e) => handleChecked(e)} />
-							<label htmlFor="rememberMe" className="text-[#6B7280] my-auto">Remember Me</label>
+		<Fragment>
+			<Helmet>
+				<title>Login | DDB Ceria</title>
+			</Helmet>
+			<div className="flex justify-center items-center flex-col h-screen w-screen px-4">
+				<header>
+					<Logo />
+				</header>
+				<main className="md:w-[500px] w-full">
+					<form className=" w-full" onSubmit={(e) => onSubmit(e)}>
+						<div className="my-10">
+							<h1 className="font-bold text-2xl">Sign in to your account</h1>
 						</div>
-						<div>
-							<Link to={"/forgot-password"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
+						<div className="mb-3">
+							<Inputs id={"email"} placeholder={"name@company.com"} label={"Your Email"} type={"email"} onChange={(e) => setForm({ ...form, email: e.target.value })} required
+							/>
 						</div>
+						<div className="mb-3">
+							<Inputs id={"password"} placeholder={"**********"} label={"Your Password"} type={"password"} onChange={(e) => setForm({ ...form, password: e.target.value })} required
+							/>
+						</div>
+						<div className="flex justify-between my-3">
+							<div className="flex">
+								<input type="checkbox" id="rememberMe" className="w-4 h-4 mr-3 my-auto" onChange={(e) => handleChecked(e)} />
+								<label htmlFor="rememberMe" className="text-[#6B7280] my-auto">Remember Me</label>
+							</div>
+							<div>
+								<Link to={"/forgot-password"} className="text-violet-800 font-semibold" >Forgot Password?</Link>
+							</div>
+						</div>
+						<div className="my-6">
+							<Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isLogged ? "Sign In" : <Spinner />} disabled={isLogged} />
+						</div>
+					</form>
+					<div>
+						<p className="text-[#6B7280]" >Don"t have account yet? <span><Link className="text-violet-800 font-semibold" to={"/register"}>Sign Up</Link></span></p>
 					</div>
-					<div className="my-6">
-						<Buttons type={"submit"} classname={"w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900"} description={!isLogged ? "Sign In" : <Spinner />} disabled={isLogged} />
-					</div>
-				</form>
-				<div>
-					<p className="text-[#6B7280]" >Don"t have account yet? <span><Link className="text-violet-800 font-semibold" to={"/register"}>Sign Up</Link></span></p>
-				</div>
-			</main>
-		</div>
+				</main>
+			</div>
+		</Fragment>
 	);
 };
 

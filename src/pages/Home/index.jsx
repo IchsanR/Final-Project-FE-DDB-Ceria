@@ -7,6 +7,7 @@ import { Tag } from "primereact/tag";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
+import { Helmet } from "react-helmet";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -76,6 +77,9 @@ const Home = () => {
 
   return (
     <Fragment>
+      <Helmet>
+        <title>Homepage | DDB Ceria</title>
+      </Helmet>
       <div className="card">
         <div className="dashboard-box bg-violet-600 text-white p-4 rounded-lg mb-2">
           <h2 className="text-lg font-semibold mb-2">Selamat datang, {name}</h2>
