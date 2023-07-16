@@ -26,6 +26,7 @@ const TransactionPage = () => {
   const dataTable = useRef(null);
   const toast = useRef(null);
   const statuses = ["SUCCESS", "WAITING_FOR_DEBITTED"];
+  const [isLoading, setIsLoading] = useState(false);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(100);
   const [statusF, setStatusF] = useState("");
@@ -159,8 +160,8 @@ const TransactionPage = () => {
           <Button
             placeholder="Reset Filter"
             onClick={handleResetFilter}
-            icon="pi pi-filter-slash"
-            label="Clear"
+            icon={isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-filter-slash'}
+            label={isLoading ? 'Loading...' : 'Clear'}
             className="p-button-outlined md:ml-2 p-button-sm text-violet-800"
           />
         </div>
@@ -187,7 +188,14 @@ const TransactionPage = () => {
       }
       //send custom date to handlefilter  
       handleFilter(sdate, edate);
-    } else {
+    } else if ((dates && (dates[0] || dates[1]))) {
+      let sdate = "";
+      let edate = "";
+      sdate = formatDateF(dates[0]);
+      edate = sdate;
+      handleFilter(sdate, edate);
+    }
+    else {
       toast.current.show({
         //alert no filter selected
         severity: "warn",
@@ -213,21 +221,29 @@ const TransactionPage = () => {
   };
 
   //reset filter
+  useEffect(() => {
+    if (isLoading) {
+      setStatusF("");
+      setDates(null);
+      setFirst(0);
+      setRows(100);
+      dispatch(fetchData(1));
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Filter Cleared",
+        life: 3000,
+      });
+      setShowPaginator(true);
+      setIsLoading(false);
+    }
+  }, [isLoading]);
+
   const handleResetFilter = () => {
-    setStatusF("");
-    setDates(null);
-    setFirst(0);
-    setRows(100);
-    filteredData = data;
-    dispatch(fetchData(1));
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Filter Cleared",
-      life: 3000,
-    });
-    setShowPaginator(true); //set show original paginator
+    setIsLoading(true);
   };
+
+
 
   //request data all
   const handleShowAll = () => {
@@ -356,9 +372,8 @@ const TransactionPage = () => {
           ref={dataTable}
           header={header}
           paginator={!showPaginator}
-          rows={5}
+          rows={100}
           loading={loading}
-          rowsPerPageOptions={[5, 10, 25, 50]}
           value={filteredData.code === 200 ? filteredData.data : data}
           tableStyle={{ minWidth: "50rem" }}
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
@@ -372,6 +387,7 @@ const TransactionPage = () => {
           }
           sortField="id"
           sortOrder={-1}
+          loader="Loading data, please wait..."
         >
           <Column field="id" sortable header="Id"></Column>
           <Column
