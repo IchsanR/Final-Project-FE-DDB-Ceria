@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { backendUrl } from "../../config/env.config";
-
+import { revertAll } from "../api/resetState";
 const initialState = {
   data: [],
   filteredData: [],
@@ -100,7 +100,8 @@ const dataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
         state.loading = false;
-      });
+      })
+      .addCase(revertAll, () => initialState);
   },
 });
 
