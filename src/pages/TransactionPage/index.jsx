@@ -161,7 +161,7 @@ const TransactionPage = () => {
             placeholder="Reset Filter"
             onClick={handleResetFilter}
             icon={isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-filter-slash'}
-            label={isLoading ? 'Loading...' : 'Clear'}
+            label={isLoading ? 'Clearing...' : 'Clear'}
             className="p-button-outlined md:ml-2 p-button-sm text-violet-800"
           />
         </div>
@@ -242,8 +242,6 @@ const TransactionPage = () => {
   const handleResetFilter = () => {
     setIsLoading(true);
   };
-
-
 
   //request data all
   const handleShowAll = () => {
