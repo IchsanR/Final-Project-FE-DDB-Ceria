@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -8,6 +8,7 @@ import {
   registerUser,
   sendEmailVerification,
 } from "../../redux/api/user";
+import { Helmet } from "react-helmet";
 
 const VerificationPage = () => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", ""]);
@@ -17,6 +18,7 @@ const VerificationPage = () => {
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [isEmailUpdated, setIsEmailUpdated] = useState(false);
+  const [isVerifS, setIsVerifS] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const email = localStorage.getItem("email");
@@ -24,6 +26,20 @@ const VerificationPage = () => {
   const dispatch = useDispatch();
   const inputRefs = useRef([]);
   const [focusedInput, setFocusedInput] = useState(0);
+
+  useEffect(() => {
+    const hasMissingData = !email || !verificationEmail;
+    if (isVerifS == false && hasMissingData) {
+      Swal.fire({
+        title: "Error!",
+        text: "Required data is missing. Please go back and provide the necessary information.",
+        timer: 2500,
+        icon: "error",
+        showConfirmButton: false,
+      });
+      navigate("/login");
+    }
+  }, [email, verificationEmail, navigate]);
 
   useEffect(() => {
     let timer;
@@ -157,7 +173,7 @@ const VerificationPage = () => {
         setLoading(true);
 
         const response = await dispatch(sendEmailVerification({ email: newEmail }));
-        console.log(response.payload.data.code)
+        console.log(response.payload.data.code);
         if (response.payload.data.code === 400) {
           Swal.fire({
             title: "Error!",
@@ -175,7 +191,7 @@ const VerificationPage = () => {
         setIsEmailUpdated(true);
         setResendTimer(15);
         setIsUpdatingEmail(false);
-  
+
         Swal.fire({
           title: "Please Wait...",
           text: "Sending a new verification email...",
@@ -192,22 +208,22 @@ const VerificationPage = () => {
             Swal.hideLoading();
           },
         });
-  
-    
-  
+
+
+
         await dispatch(sendEmailVerification({ email: newEmail }));
-  
+
         Swal.fire({
           title: "Verification Link Sent",
           text: "The verification link has been sent to your new email.",
           icon: "success",
           timer: 5000,
         });
-  
+
         setLoading(false);
       } catch (error) {
         setLoading(false);
-  
+
         Swal.fire({
           title: "Error!",
           text: "There was an error while sending the new verification email.",
@@ -220,20 +236,20 @@ const VerificationPage = () => {
     }
   };
 
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const code = verificationCode.join("");
 
- 
+
 
     try {
       setLoading(true);
 
       const response = await dispatch(compareVerificationCode({ email, code }));
 
-    
+
       if (response.payload.data.message === "Success Verification Code") {
         const name = localStorage.getItem("name");
         const email = localStorage.getItem("email");
@@ -250,6 +266,9 @@ const VerificationPage = () => {
         localStorage.removeItem("phone");
         localStorage.removeItem("password");
         localStorage.removeItem("verificationEmail");
+        setIsVerifS(true);
+
+
 
         Swal.fire({
           title: "Verification Successful",
@@ -279,7 +298,7 @@ const VerificationPage = () => {
     } catch (error) {
       setLoading(false);
 
- 
+
 
       Swal.fire({
         title: "Error!",
@@ -294,123 +313,127 @@ const VerificationPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
-      <header className="mb-2">
-        <Logo />
-      </header>
-      <main className="md:w-[500px] w-full max-w-md">
-        <form className="w-full" onSubmit={handleSubmit}>
-          <div className="my-6">
-            <h1 className="font-bold text-2xl">Account Verification</h1>
-          </div>
-          <div className="mb-6">
-            <p className="text-gray-700">
-              {isEmailUpdated ? (
-                <>
-                  A verification code has been sent to <strong>{verificationEmail}</strong>. Please enter the verification code to proceed.
-                </>
-              ) : (
-                <>
-                 The verification code has been sent to <strong>{email}</strong>. Please enter the verification code to proceed. Wrong email?{" "}
+    <Fragment>
+      <Helmet>
+        <title>OTP Verification | DDB Ceria</title>
+      </Helmet>
+      <div className="flex flex-col min-h-screen items-center justify-center px-3 py-3">
+        <header className="mb-2">
+          <Logo />
+        </header>
+        <main className="md:w-[500px] w-full max-w-md">
+          <form className="w-full" onSubmit={handleSubmit}>
+            <div className="my-6">
+              <h1 className="font-bold text-2xl">Account Verification</h1>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-700">
+                {isEmailUpdated ? (
+                  <>
+                    A verification code has been sent to <strong>{verificationEmail}</strong>. Please enter the verification code to proceed.
+                  </>
+                ) : (
+                  <>
+                    The verification code has been sent to <strong>{email}</strong>. Please enter the verification code to proceed. Wrong email?{" "}
+                    <button
+                      type="button"
+                      className="text-blue-500 hover:text-blue-700"
+                      onClick={handleUpdateEmail}
+                    >
+                      Update email
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
+            {isUpdatingEmail ? (
+              <div className="flex items-center justify-center mb-6">
+                <input
+                  type="email"
+                  className="w-full px-3 py-2 border rounded focus:outline-none"
+                  placeholder="New Email"
+                  value={newEmail}
+                  onChange={handleEmailChange}
+                />
+                <button
+                  type="button"
+                  className="text-red-500 hover:text-red-700 ml-4"
+                  onClick={handleCancelUpdateEmail}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="text-blue-500 hover:text-blue-700 ml-4"
+                  onClick={handleUpdateEmailSubmit}
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center mb-6">
+                {verificationCode.map((value, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    className="w-12 h-12 text-4xl text-center border rounded mx-1 focus:outline-none focus:ring focus:border-blue-300"
+                    maxLength={1}
+                    value={value}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    onPaste={handlePaste}
+                    ref={(ref) => (inputRefs.current[index] = ref)}
+                    tabIndex={focusedInput === index ? 0 : -1}
+                  />
+                ))}
+              </div>
+            )}
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-700">
+                Not receiving the code?{" "}
+                {!isUpdatingEmail && (
                   <button
                     type="button"
                     className="text-blue-500 hover:text-blue-700"
-                    onClick={handleUpdateEmail}
+                    onClick={handleResend}
+                    disabled={resendTimer > 0}
                   >
-                    Update email
+                    Resend the code
                   </button>
-                </>
-              )}
-            </p>
-          </div>
-          {isUpdatingEmail ? (
-            <div className="flex items-center justify-center mb-6">
-              <input
-                type="email"
-                className="w-full px-3 py-2 border rounded focus:outline-none"
-                placeholder="New Email"
-                value={newEmail}
-                onChange={handleEmailChange}
-              />
-              <button
-                type="button"
-                className="text-red-500 hover:text-red-700 ml-4"
-                onClick={handleCancelUpdateEmail}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="text-blue-500 hover:text-blue-700 ml-4"
-                onClick={handleUpdateEmailSubmit}
-              >
-                Save
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center mb-6">
-              {verificationCode.map((value, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  className="w-12 h-12 text-4xl text-center border rounded mx-1 focus:outline-none focus:ring focus:border-blue-300"
-                  maxLength={1}
-                  value={value}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={handlePaste}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
-                  tabIndex={focusedInput === index ? 0 : -1}
-                />
-              ))}
-            </div>
-          )}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-700">
-Not receiving the code?{" "}
-              {!isUpdatingEmail && (
-                <button
-                  type="button"
-                  className="text-blue-500 hover:text-blue-700"
-                  onClick={handleResend}
-                  disabled={resendTimer > 0}
-                >
-                  Resend the code
-                </button>
-              )}
-              {isUpdatingEmail ? (
-                <span className="text-gray-500 ml-2">Please update your email first.</span>
-              ) : (
-                resendTimer > 0 && (
-                  <span className="text-gray-500 ml-2">
-                    ({Math.floor(resendTimer / 60)}:{resendTimer % 60})
-                  </span>
-                )
-              )}
-            </p>
-          </div>
-          <div className="my-6">
-            <Buttons
-              type="submit"
-              classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              description={
-                loading ? (
-                  <div className="flex items-center justify-center">
-                    <Spinner />
-                    <span className="ml-2">Please Wait...</span>
-                  </div>
+                )}
+                {isUpdatingEmail ? (
+                  <span className="text-gray-500 ml-2">Please update your email first.</span>
                 ) : (
-                  "Verifikasi"
-                )
-              }
-              disabled={loading || isUpdatingEmail}
-            />
-          </div>
-        </form>
-      </main>
-    </div>
+                  resendTimer > 0 && (
+                    <span className="text-gray-500 ml-2">
+                      ({Math.floor(resendTimer / 60)}:{resendTimer % 60})
+                    </span>
+                  )
+                )}
+              </p>
+            </div>
+            <div className="my-6">
+              <Buttons
+                type="submit"
+                classname={`w-full bg-violet-800 text-white h-12 rounded-lg hover:bg-violet-900 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                description={
+                  loading ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner />
+                      <span className="ml-2">Please Wait...</span>
+                    </div>
+                  ) : (
+                    "Verifikasi"
+                  )
+                }
+                disabled={loading || isUpdatingEmail}
+              />
+            </div>
+          </form>
+        </main>
+      </div>
+    </Fragment>
   );
 };
 

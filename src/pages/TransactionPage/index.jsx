@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Paginator } from "primereact/paginator";
 import {
@@ -19,6 +19,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css"; // theme
 import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
 import ExportCsv from "../../components/molecule/ExportCsv";
+import { Helmet } from "react-helmet";
 
 const TransactionPage = () => {
   const dispatch = useDispatch();
@@ -173,15 +174,18 @@ const TransactionPage = () => {
   //set custom filter global date status
   const fiterDateStatus = () => {
     //validation date and status
-    if (dates || statusF !== "") {
+    if ((dates && (dates[0] && dates[1])) || statusF !== "") {
       let sdate = "";
       let edate = "";
       //custom format date
-      if (dates) {
+      if (dates && (dates[0] && dates[1])) {
         sdate = formatDateF(dates[0]);
         edate = formatDateF(dates[1]);
+      } else if (dates && dates[0]) {
+        sdate = formatDateF(dates[0]);
+        edate = sdate;
       }
-      //send custom date to handlefilter
+      //send custom date to handlefilter  
       handleFilter(sdate, edate);
     } else {
       toast.current.show({
@@ -232,44 +236,53 @@ const TransactionPage = () => {
   };
 
   //template save data to excel
-  const exportExcel = () => {
-    import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
-      for (let rowNum = 2; rowNum <= filteredData.data.length + 1; rowNum++) {
-        const cellRefB = "B" + rowNum;
-        const cellRefC = "C" + rowNum;
-        const cellB = worksheet[cellRefB];
-        cellB.t = "s";
-        cellB.v = String(cellB.v);
-        const cellC = worksheet[cellRefC];
-        cellC.t = "s";
-        cellC.v = String(cellC.v);
-      }
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      saveAsExcelFile(excelBuffer, "data-transaction");
-    });
-  };
+  // const exportExcel = () => {
+  //   if(filteredData.data){
+  //   import("xlsx").then((xlsx) => {
+  //     const worksheet = xlsx.utils.json_to_sheet(filteredData.data);
+  //     for (let rowNum = 2; rowNum <= filteredData.data.length + 1; rowNum++) {
+  //       const cellRefB = "B" + rowNum;
+  //       const cellRefC = "C" + rowNum;
+  //       const cellB = worksheet[cellRefB];
+  //       cellB.t = "s";
+  //       cellB.v = String(cellB.v);
+  //       const cellC = worksheet[cellRefC];
+  //       cellC.t = "s";
+  //       cellC.v = String(cellC.v);
+  //     }
+  //     const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+  //     const excelBuffer = xlsx.write(workbook, {
+  //       bookType: "xlsx",
+  //       type: "array",
+  //     });
+  //     saveAsExcelFile(excelBuffer, "data-transaction");
+  //   });
+  // }else {
+  //   toast.current.show({
+  //     severity: "error",
+  //     summary: "Error",
+  //     detail: "An error no data.",
+  //     life: 3000,
+  //   });
+  // }
+  // };
 
-  const saveAsExcelFile = (buffer, fileName) => {
-    import("file-saver").then((module) => {
-      if (module && module.default) {
-        let EXCEL_TYPE =
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-        let EXCEL_EXTENSION = ".xlsx";
-        const data = new Blob([buffer], {
-          type: EXCEL_TYPE,
-        });
-        module.default.saveAs(
-          data,
-          fileName + "_export_" + new Date() + EXCEL_EXTENSION
-        );
-      }
-    });
-  };
+  // const saveAsExcelFile = (buffer, fileName) => {
+  //   import("file-saver").then((module) => {
+  //     if (module && module.default) {
+  //       let EXCEL_TYPE =
+  //         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  //       let EXCEL_EXTENSION = ".xlsx";
+  //       const data = new Blob([buffer], {
+  //         type: EXCEL_TYPE,
+  //       });
+  //       module.default.saveAs(
+  //         data,
+  //         fileName + "_export_" + new Date() + EXCEL_EXTENSION
+  //       );
+  //     }
+  //   });
+  // };
 
   //template paginator right side
   const paginatorRight = (
@@ -285,14 +298,15 @@ const TransactionPage = () => {
 
   //template paginator left side
   const paginatorLeft = (
-    <Button
-      type="button"
-      icon="pi pi-download"
-      text
-      onClick={exportExcel}
-      tooltip="Download Data Table"
-      tooltipOptions={{ position: "bottom" }}
-    />
+    // <Button
+    //   type="button"
+    //   icon="pi pi-download"
+    //   text
+    //   onClick={exportExcel}
+    //   tooltip="Download Data Table"
+    //   tooltipOptions={{ position: "bottom" }}
+    // />
+    <span />
   );
 
   //request data pagination
@@ -332,7 +346,10 @@ const TransactionPage = () => {
   const header = renderHeader();
 
   return (
-    <>
+    <Fragment>
+      <Helmet>
+        <title>Transaction | DDB Ceria</title>
+      </Helmet>
       <div className="card">
         <Toast ref={toast} />
         <DataTable
@@ -412,7 +429,7 @@ const TransactionPage = () => {
           />
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 

@@ -8,13 +8,6 @@ import {
 } from "react-router-dom";
 import Swal from "sweetalert2";
 import routers from "./routers";
-const routes = [
-	{
-		elements: <Login></Login>,
-		path: "/login",
-		layout: false,
-	},
-];
 
 const Router = () => {
 	const PrivateRoute = () => {
@@ -23,8 +16,8 @@ const Router = () => {
 			return <Outlet />;
 		} else {
 			Swal.fire({
-				title: "Halaman tidak bisa di akses",
-				text: "Harap login terlebih dahulu",
+				title: "You can't access this page",
+				text: "Login First!",
 				icon: "error",
 			});
 			return <Navigate to={"/login"} />;
