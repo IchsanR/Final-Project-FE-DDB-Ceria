@@ -34,9 +34,17 @@ const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const [phoneError, setPhoneError] = useState(false);
 
   const handleChecked = (e) => {
     setChecked(e.target.checked);
+  };
+
+  const handleNameChange = (e) => {
+    const name = e.target.value;
+    setForm({ ...form, name: name });
+    setNameError(name.length < 3);
   };
 
   const handlePasswordChange = (e) => {
@@ -142,7 +150,6 @@ const Register = () => {
             timer: 10000,
           });
 
-       
           localStorage.setItem("name", form.name);
           localStorage.setItem("email", form.email);
           localStorage.setItem("phone", form.phone);
@@ -185,6 +192,12 @@ const Register = () => {
     }
   };
 
+  const handlePhoneChange = (e) => {
+    const phoneNumber = e.target.value;
+    setForm({ ...form, phone: phoneNumber });
+    setPhoneError(phoneNumber.length < 10);
+  };
+
   const handleTermsClick = (e) => {
     e.preventDefault();
     setOpenModal(true);
@@ -211,9 +224,14 @@ const Register = () => {
                 label="Name"
                 type="text"
                 name="name"
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={handleNameChange}
                 required
               />
+              {nameError && (
+                <div className="text-red-500 text-xs mt-1">
+                  Please insert a valid name (minimum 3 characters)
+                </div>
+              )}
             </div>
             <div className="mb-3">
               <Inputs
@@ -227,16 +245,21 @@ const Register = () => {
               />
             </div>
             <div className="mb-3">
-              <Inputs
-                id="Phone Number"
-                placeholder="0812xxxxxx"
-                label="Phone Number"
-                type="number"
-                name="phone"
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                required
-              />
-            </div>
+  <Inputs
+    id="phone"
+    placeholder="0812xxxxxx"
+    label="Phone Number"
+    type="text"
+    name="phone"
+    onChange={handlePhoneChange}
+    required
+  />
+  {phoneError && (
+    <div className="text-red-500 text-xs mt-1">
+      Please input a valid phone number (minimum 10 characters)
+    </div>
+  )}
+</div>
             <div className="relative">
               <Inputs
                 id="password"
@@ -285,17 +308,17 @@ const Register = () => {
                     <div className="text-right">
                       <span
                         className={`text-sm font-semibold inline-block ${passwordStrength.score >= 3
-                            ? "text-green-500"
-                            : passwordStrength.score === 2
-                              ? "text-orange-500"
-                              : "text-red-500"
-                          }`}
+                          ? "text-green-500"
+                          : passwordStrength.score === 2
+                          ? "text-orange-500"
+                          : "text-red-500"
+                        }`}
                       >
                         {passwordStrength.score >= 3
                           ? "Strong"
                           : passwordStrength.score === 2
-                            ? "Medium"
-                            : "Weak"}
+                          ? "Medium"
+                          : "Weak"}
                       </span>
                     </div>
                   </div>
@@ -305,8 +328,8 @@ const Register = () => {
                       className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${passwordStrength.score >= 3
                           ? "bg-green-500"
                           : passwordStrength.score === 2
-                            ? "bg-orange-500"
-                            : "bg-red-500"
+                          ? "bg-orange-500"
+                          : "bg-red-500"
                         }`}
                     ></div>
                   </div>
@@ -354,7 +377,7 @@ const Register = () => {
                     "Sign Up"
                   )
                 }
-                disabled={loading || passwordMismatch}
+                disabled={loading || passwordMismatch || nameError}
               />
             </div>
           </form>
